@@ -8,7 +8,7 @@ from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 
-from .schemas import DirectionPreviewIn, MockMessageIn, MockSelectIn, NearbyPreviewIn
+from .schemas import DirectionPreviewIn, MessagePreviewIn, NearbyPreviewIn, SelectPreviewIn
 from .services import (
     DEMO_DATA_PATH,
     MENU_OPTIONS,
@@ -17,11 +17,11 @@ from .services import (
     guest_context,
     load_demo_data,
     menu_payload,
-    mock_action_response,
     nearby_places_response,
     normalize_phone,
+    preview_action_response,
     process_whatsapp_webhook_payload,
-    receive_mock_message,
+    receive_preview_message,
     whatsapp_provider,
 )
 
@@ -55,7 +55,7 @@ def root() -> dict:
         "status": "ok",
         "health": "/health",
         "docs": "/docs",
-        "mock_menu": "/api/mock-whatsapp/menu?phone=919999000001",
+        "menu_preview": "/api/whatsapp/menu-preview?phone=919999000001",
     }
 
 
@@ -97,19 +97,19 @@ async def receive_webhook(request: Request) -> dict:
     return {"ok": True, "processed": results}
 
 
-@app.get("/api/mock-whatsapp/menu")
-def get_mock_menu(phone: str = "") -> dict:
+@app.get("/api/whatsapp/menu-preview")
+def get_menu_preview(phone: str = "") -> dict:
     return menu_payload(phone)
 
 
-@app.post("/api/mock-whatsapp/message")
-def receive_mock_whatsapp_message(payload: MockMessageIn) -> dict:
-    return receive_mock_message(payload.phone, payload.text)
+@app.post("/api/whatsapp/message-preview")
+def receive_whatsapp_message_preview(payload: MessagePreviewIn) -> dict:
+    return receive_preview_message(payload.phone, payload.text)
 
 
-@app.post("/api/mock-whatsapp/select")
-def select_mock_option(payload: MockSelectIn) -> dict:
-    return mock_action_response(payload.phone, payload.action)
+@app.post("/api/whatsapp/select-preview")
+def select_whatsapp_option_preview(payload: SelectPreviewIn) -> dict:
+    return preview_action_response(payload.phone, payload.action)
 
 
 @app.get("/api/guest/profile")

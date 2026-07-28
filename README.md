@@ -18,7 +18,7 @@ No AI or LLM is used in this POC. The assistant uses stored demo booking/propert
 - Maintenance issue showcase flow
 - Directions from guest location using Google Maps when `GOOGLE_MAPS_API_KEY` is configured
 - Meta WhatsApp Cloud API webhook support
-- Mock WhatsApp endpoints for local demos
+- WhatsApp preview endpoints for backend demos
 
 ## Structure
 
@@ -83,18 +83,18 @@ Known guest numbers:
 
 Unknown numbers receive a booking-not-found response.
 
-## Mock Demo Flow
+## Preview Demo Flow
 
-Open the mock menu:
+Open the menu preview:
 
 ```http
-GET /api/mock-whatsapp/menu?phone=919999000001
+GET /api/whatsapp/menu-preview?phone=919999000001
 ```
 
-Send a mock guest message:
+Preview a guest message:
 
 ```http
-POST /api/mock-whatsapp/message
+POST /api/whatsapp/message-preview
 Content-Type: application/json
 ```
 
@@ -108,7 +108,7 @@ Content-Type: application/json
 Select a menu action:
 
 ```http
-POST /api/mock-whatsapp/select
+POST /api/whatsapp/select-preview
 Content-Type: application/json
 ```
 
@@ -190,14 +190,7 @@ WHATSAPP_GRAPH_API_VERSION=v20.0
 GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 ```
 
-For mock outbound mode, keep:
-
-```text
-FORCE_MOCK_WHATSAPP=true
-WHATSAPP_PROVIDER=mock
-```
-
-In mock outbound mode, webhooks are still processed, but replies are not sent through Meta Cloud API. This avoids Meta token errors during backend demos.
+For real WhatsApp replies, `WHATSAPP_ACCESS_TOKEN` must be a valid Meta Cloud API token and `WHATSAPP_PHONE_NUMBER_ID` must be the Phone Number ID for the WhatsApp sender. If Meta returns `401` with OAuth code `190`, refresh the token and redeploy.
 
 Webhook callback URL:
 

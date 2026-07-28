@@ -3,12 +3,12 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 
-class MockMessageIn(BaseModel):
+class MessagePreviewIn(BaseModel):
     phone: str
     text: str = ""
 
 
-class MockSelectIn(BaseModel):
+class SelectPreviewIn(BaseModel):
     phone: str
     action: str
 

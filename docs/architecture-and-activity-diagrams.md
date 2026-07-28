@@ -8,7 +8,7 @@ The POC is a backend-only WhatsApp guest assistant. A confirmed guest messages t
 flowchart LR
     Guest["Confirmed Guest<br/>WhatsApp User"]
     Meta["Meta WhatsApp<br/>Cloud API"]
-    API["FastAPI Backend<br/>Webhook + Mock APIs"]
+    API["FastAPI Backend<br/>Webhook + Preview APIs"]
     Data["Demo JSON<br/>Bookings + Properties + Templates"]
     Maps["Google Maps APIs<br/>Places + Distance"]
     Host["Host / Property Team"]
@@ -30,7 +30,7 @@ flowchart LR
 | Guest | Uses WhatsApp to request stay information. |
 | Meta WhatsApp Cloud API | Delivers inbound guest messages and outbound assistant replies. |
 | FastAPI Backend | Handles webhook verification, message parsing, guest lookup, menu routing, template selection and Maps calls. |
-| Demo JSON | Stores confirmed bookings, property instructions, curated fallback places and randomized reply templates. |
+| Demo JSON | Stores confirmed bookings, property instructions and randomized reply templates. |
 | Google Maps APIs | Return live nearby places, distance and travel time when a guest shares location. |
 | Host | Receives the maintenance issue in the production version; this POC only showcases the acknowledgement. |
 
@@ -75,9 +75,9 @@ flowchart TD
 | Health | `GET /health` | Confirms assistant status and demo configuration. |
 | WhatsApp verify | `GET /webhook/whatsapp` | Used by Meta to verify the callback URL. |
 | WhatsApp receive | `POST /webhook/whatsapp` | Receives WhatsApp messages, buttons, locations and status updates. |
-| Mock menu | `GET /api/mock-whatsapp/menu` | Shows the menu for a demo phone number. |
-| Mock message | `POST /api/mock-whatsapp/message` | Simulates a guest text message. |
-| Mock select | `POST /api/mock-whatsapp/select` | Simulates a menu/button action. |
+| Menu preview | `GET /api/whatsapp/menu-preview` | Shows the menu for a demo phone number. |
+| Message preview | `POST /api/whatsapp/message-preview` | Previews a guest text message flow. |
+| Select preview | `POST /api/whatsapp/select-preview` | Previews a menu/button action. |
 | Guest profile | `GET /api/guest/profile` | Exposes matched demo guest/property context. |
 | Nearby places | `POST /api/nearby/preview` | Simulates live nearby grocery, medical or mall search. |
 | Directions | `POST /api/directions/preview` | Simulates location-based route calculation. |
@@ -90,7 +90,6 @@ The POC data is read from `backend/data/guest_assistant_demo.json`.
 ```mermaid
 erDiagram
     BOOKING }o--|| PROPERTY : references
-    PROPERTY ||--o{ NEARBY_PLACE : lists
     PROPERTY ||--|| HOST : has
     RESPONSE_TEMPLATE }o--|| INTENT : supports
 

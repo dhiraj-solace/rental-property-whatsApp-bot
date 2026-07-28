@@ -117,9 +117,7 @@ def normalize_phone(phone: str | None) -> str:
 
 
 def whatsapp_provider() -> str:
-    if os.getenv("FORCE_MOCK_WHATSAPP", "").strip().lower() in {"1", "true", "yes", "on"}:
-        return "mock"
-    return os.getenv("WHATSAPP_PROVIDER", "mock").strip().lower() or "mock"
+    return "meta"
 
 
 def load_demo_data(force_reload: bool = False) -> dict[str, Any]:
@@ -139,9 +137,6 @@ def send_whatsapp_text(to_phone: str, body: str) -> dict[str, Any]:
     to_phone = normalize_phone(to_phone)
     provider = whatsapp_provider()
     logger.info("whatsapp_send_start provider=%s to=%s body_chars=%s", provider, to_phone, len(body))
-    if provider != "meta":
-        return {"delivery_status": "mock_sent", "provider_message_id": None, "body": body}
-
     phone_number_id = os.getenv("WHATSAPP_PHONE_NUMBER_ID", "").strip()
     access_token = os.getenv("WHATSAPP_ACCESS_TOKEN", "").strip()
     graph_version = os.getenv("WHATSAPP_GRAPH_API_VERSION", "v20.0").strip() or "v20.0"
@@ -639,11 +634,11 @@ def handle_issue_description(phone: str, text: str) -> dict[str, Any]:
     return {"action": "report_issue_confirm", "reply": reply, "delivery": delivery, "stored": False}
 
 
-def receive_mock_message(phone: str, text: str) -> dict[str, Any]:
+def receive_preview_message(phone: str, text: str) -> dict[str, Any]:
     return process_incoming_whatsapp_message(phone, {"type": "text", "text": text})
 
 
-def mock_action_response(phone: str, action: str) -> dict[str, Any]:
+def preview_action_response(phone: str, action: str) -> dict[str, Any]:
     return answer_intent(phone, resolve_intent(action) or action)
 
 

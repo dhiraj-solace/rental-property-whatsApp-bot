@@ -1,9 +1,5 @@
 {
   "version": 2,
-  "env": {
-    "FORCE_MOCK_WHATSAPP": "true",
-    "WHATSAPP_PROVIDER": "mock"
-  },
   "builds": [
     {
       "src": "api/index.py",

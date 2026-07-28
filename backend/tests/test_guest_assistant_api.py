@@ -5,13 +5,13 @@ import unittest
 
 from app.main import (
     directions_preview,
-    get_mock_menu,
+    get_menu_preview,
     guest_profile,
     nearby_preview,
-    receive_mock_whatsapp_message,
-    select_mock_option,
+    receive_whatsapp_message_preview,
+    select_whatsapp_option_preview,
 )
-from app.schemas import DirectionPreviewIn, MockMessageIn, MockSelectIn, NearbyPreviewIn
+from app.schemas import DirectionPreviewIn, MessagePreviewIn, NearbyPreviewIn, SelectPreviewIn
 from app.services import clear_runtime_state, process_whatsapp_webhook_payload
 
 
@@ -25,7 +25,7 @@ class GuestAssistantApiTests(unittest.TestCase):
         os.environ.pop("GOOGLE_MAPS_API_KEY", None)
 
     def test_known_guest_receives_personal_menu(self) -> None:
-        response = get_mock_menu(KNOWN_PHONE)
+        response = get_menu_preview(KNOWN_PHONE)
 
         self.assertTrue(response["known_guest"])
         self.assertEqual(response["booking"]["booking_id"], "BK-CASA-1001")
@@ -34,7 +34,7 @@ class GuestAssistantApiTests(unittest.TestCase):
         self.assertIn("Casa Azul Beach Villa", response["reply"])
 
     def test_unknown_guest_gets_booking_fallback(self) -> None:
-        response = get_mock_menu(UNKNOWN_PHONE)
+        response = get_menu_preview(UNKNOWN_PHONE)
 
         self.assertFalse(response["known_guest"])
         self.assertEqual(response["options"], [])
@@ -43,15 +43,15 @@ class GuestAssistantApiTests(unittest.TestCase):
         )
 
     def test_wifi_action_returns_stored_demo_details_with_variant_reply(self) -> None:
-        response = select_mock_option(MockSelectIn(phone=KNOWN_PHONE, action="wifi"))
+        response = select_whatsapp_option_preview(SelectPreviewIn(phone=KNOWN_PHONE, action="wifi"))
 
         self.assertEqual(response["action"], "wifi")
         self.assertIn("CasaAzul_Guest", response["reply"])
         self.assertIn("BeachStay4521", response["reply"])
 
     def test_nearby_places_starts_live_category_flow(self) -> None:
-        response = receive_mock_whatsapp_message(
-            MockMessageIn(phone=KNOWN_PHONE, text="nearby places")
+        response = receive_whatsapp_message_preview(
+            MessagePreviewIn(phone=KNOWN_PHONE, text="nearby places")
         )
 
         self.assertEqual(response["action"], "nearby_category_prompt")
@@ -59,8 +59,8 @@ class GuestAssistantApiTests(unittest.TestCase):
         self.assertIn("medical", response["reply"].lower())
 
     def test_nearby_category_asks_for_guest_location(self) -> None:
-        receive_mock_whatsapp_message(MockMessageIn(phone=KNOWN_PHONE, text="nearby places"))
-        response = receive_mock_whatsapp_message(MockMessageIn(phone=KNOWN_PHONE, text="grocery"))
+        receive_whatsapp_message_preview(MessagePreviewIn(phone=KNOWN_PHONE, text="nearby places"))
+        response = receive_whatsapp_message_preview(MessagePreviewIn(phone=KNOWN_PHONE, text="grocery"))
 
         self.assertEqual(response["action"], "nearby_location_prompt")
         self.assertEqual(response["category"], "grocery")
@@ -83,9 +83,9 @@ class GuestAssistantApiTests(unittest.TestCase):
         self.assertIn("Medical", response["reply"])
 
     def test_report_issue_is_showcased_without_database_storage(self) -> None:
-        prompt = receive_mock_whatsapp_message(MockMessageIn(phone=KNOWN_PHONE, text="report issue"))
-        response = receive_mock_whatsapp_message(
-            MockMessageIn(phone=KNOWN_PHONE, text="Bedroom AC is not cooling")
+        prompt = receive_whatsapp_message_preview(MessagePreviewIn(phone=KNOWN_PHONE, text="report issue"))
+        response = receive_whatsapp_message_preview(
+            MessagePreviewIn(phone=KNOWN_PHONE, text="Bedroom AC is not cooling")
         )
 
         self.assertEqual(prompt["action"], "report_issue")
@@ -141,8 +141,8 @@ class GuestAssistantApiTests(unittest.TestCase):
         self.assertIn("maps_url", results[0]["directions"])
 
     def test_webhook_location_message_triggers_live_nearby_when_pending(self) -> None:
-        receive_mock_whatsapp_message(MockMessageIn(phone=KNOWN_PHONE, text="nearby places"))
-        receive_mock_whatsapp_message(MockMessageIn(phone=KNOWN_PHONE, text="mall"))
+        receive_whatsapp_message_preview(MessagePreviewIn(phone=KNOWN_PHONE, text="nearby places"))
+        receive_whatsapp_message_preview(MessagePreviewIn(phone=KNOWN_PHONE, text="mall"))
         payload = {
             "entry": [
                 {
