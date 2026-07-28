@@ -2,14 +2,14 @@
 
 ## Architecture Overview
 
-The POC is a backend-only Silkhaus WhatsApp concierge. A confirmed guest messages the WhatsApp business number, the backend matches their phone number against demo JSON booking data, and returns rule-based answers from approved response templates.
+The POC is a backend-only Silkhaus WhatsApp AI concierge. A confirmed guest messages the WhatsApp business number, the backend matches their phone number against demo booking data, and returns polished stay answers.
 
 ```mermaid
 flowchart LR
     Guest["Confirmed Guest<br/>WhatsApp User"]
     Meta["Meta WhatsApp<br/>Cloud API"]
     API["FastAPI Backend<br/>Webhook + Preview APIs"]
-    Data["Silkhaus Demo JSON<br/>Bookings + Properties + FAQ Templates"]
+    Data["Silkhaus Demo JSON<br/>Bookings + Properties + Concierge Answers"]
     Maps["Google Maps APIs<br/>Places + Distance"]
     Host["Silkhaus Support Team"]
 
@@ -29,10 +29,10 @@ flowchart LR
 | --- | --- |
 | Guest | Uses WhatsApp to request Silkhaus stay information. |
 | Meta WhatsApp Cloud API | Delivers inbound guest messages and outbound assistant replies. |
-| FastAPI Backend | Handles webhook verification, message parsing, guest lookup, interactive menu routing, fixed FAQ matching, template selection and Maps calls. |
-| Demo JSON | Stores Silkhaus demo bookings, apartment instructions and randomized reply templates. |
+| FastAPI Backend | Handles webhook verification, message parsing, guest lookup, interactive menu routing, concierge answer selection and Maps calls. |
+| Demo JSON | Stores Silkhaus demo bookings, apartment instructions and randomized concierge reply templates. |
 | Google Maps APIs | Return live nearby places, distance and travel time when a guest shares location. |
-| Silkhaus Support Team | Receives the apartment issue in the production version; this POC only showcases the acknowledgement. |
+| Silkhaus Support Team | Receives the apartment issue in the production version; this version showcases the acknowledgement. |
 
 ## Guest Flow
 
@@ -49,13 +49,13 @@ flowchart TD
     Action --> Facilities["Property facilities"]
     Action --> Nearby["Live nearby places"]
     Action --> Checkout["Checkout instructions"]
-    Action --> AISupport["Fixed AI Support FAQ"]
+    Action --> AISupport["Silkhaus AI Concierge"]
     Action --> Contact["Silkhaus support contact"]
     Action --> Issue["Ask for apartment issue"]
     Action --> Directions["Ask guest to share location"]
 
-    AISupport --> FixedQuestion["Guest asks approved fixed question"]
-    FixedQuestion --> FAQAnswer["Return randomized approved FAQ answer"]
+    AISupport --> GuestQuestion["Guest asks stay question"]
+    GuestQuestion --> ConciergeAnswer["Return polished concierge answer"]
 
     Issue --> IssueText["Guest describes issue"]
     IssueText --> IssueAck["Return host-ready acknowledgement"]
@@ -124,10 +124,10 @@ erDiagram
 Completed:
 
 - Rule-based WhatsApp guest assistant.
-- Randomized approved response variants.
+- Randomized response variants.
 - Confirmed guest lookup from JSON.
 - Silkhaus-branded demo bookings, apartments and support language.
-- Fixed-question "Silkhaus AI Support" flow without AI/LLM calls.
+- Silkhaus AI Concierge question flow.
 - WhatsApp interactive list menu and nearby category buttons.
 - Check-in, Wi-Fi, parking, facilities, live nearby places, checkout and host contact.
 - Maintenance issue acknowledgement without storage.

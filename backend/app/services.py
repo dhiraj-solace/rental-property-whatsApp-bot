@@ -26,7 +26,7 @@ MENU_OPTIONS = {
     "facilities": "Apartment amenities",
     "nearby_places": "Live nearby places",
     "checkout": "Checkout instructions",
-    "ai_support": "Silkhaus AI Support",
+    "ai_support": "Silkhaus AI Concierge",
     "contact_host": "Contact support",
     "report_issue": "Report apartment issue",
     "directions": "Get directions",
@@ -88,6 +88,7 @@ TEXT_ALIASES = {
     "7": "ai_support",
     "ai": "ai_support",
     "ai support": "ai_support",
+    "ai concierge": "ai_support",
     "assistant": "ai_support",
     "concierge": "ai_support",
     "faq": "ai_support",
@@ -151,7 +152,7 @@ def brand_values() -> dict[str, str]:
     brand = load_demo_data().get("brand", {})
     return {
         "brand_name": brand.get("name", "Silkhaus"),
-        "concierge_name": brand.get("concierge_name", "Silkhaus AI Support"),
+        "concierge_name": brand.get("concierge_name", "Silkhaus AI Concierge"),
         "support_phone": brand.get("support_phone", ""),
         "support_email": brand.get("support_email", ""),
     }
@@ -357,7 +358,7 @@ def menu_sections() -> list[dict[str, Any]]:
             "title": "Help",
             "rows": [
                 {"id": "nearby_places", "title": "Nearby places", "description": "Grocery, medical or mall"},
-                {"id": "ai_support", "title": "AI Support", "description": "Ask fixed Silkhaus FAQs"},
+                {"id": "ai_support", "title": "AI Concierge", "description": "Ask about your stay"},
                 {"id": "contact_host", "title": "Contact support", "description": "Support phone and email"},
                 {"id": "report_issue", "title": "Report issue", "description": "Send apartment issue"},
                 {"id": "directions", "title": "Directions", "description": "Route to the apartment"},

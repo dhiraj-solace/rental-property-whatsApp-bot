@@ -67,7 +67,7 @@ def health() -> dict:
         "assistant": "silkhaus_concierge",
         "ai_enabled": False,
         "reply_style": "rule_based_random_templates",
-        "ai_support_mode": "fixed_question_rule_based",
+        "ai_support_mode": "silkhaus_ai_concierge",
         "whatsapp_provider": whatsapp_provider(),
         "demo_data_path": str(DEMO_DATA_PATH),
         "properties": len(data.get("properties", [])),

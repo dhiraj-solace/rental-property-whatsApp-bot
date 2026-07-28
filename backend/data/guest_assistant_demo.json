@@ -1,7 +1,7 @@
 {
   "brand": {
     "name": "Silkhaus",
-    "concierge_name": "Silkhaus AI Support",
+    "concierge_name": "Silkhaus AI Concierge",
     "support_phone": "+971 (0)4 4396 243",
     "support_email": "reservations@silkhaus.co",
     "office_address": "Level 10, Al Thuraya Tower 1, Dubai Media City, Dubai, UAE"
@@ -149,7 +149,7 @@
       "question": "How does self check-in work?",
       "keywords": ["self check in", "self-check-in", "smart lock", "access code", "door code", "check in process"],
       "answers": [
-        "For {property_name}, check-in is from {check_in_time}. Use the building instructions and smart lock code from your confirmed booking details. Your current demo access code is included in the check-in menu.",
+        "For {property_name}, check-in is from {check_in_time}. Use the building instructions and smart lock code from your confirmed booking details. Your current access code is included in the check-in menu.",
         "Self check-in means you can arrive without waiting at a front desk. Follow the apartment access steps, keep ID ready for building security, and contact Silkhaus support if access needs help."
       ]
     },
@@ -176,7 +176,7 @@
       "question": "How can I contact support?",
       "keywords": ["contact support", "support hours", "24/7", "concierge", "help team", "call silkhaus"],
       "answers": [
-        "You can contact {brand_name} support at {support_phone} or {support_email}. For this POC, WhatsApp is the primary concierge channel.",
+        "You can contact {brand_name} support at {support_phone} or {support_email}. WhatsApp is the primary concierge channel for quick stay help.",
         "{brand_name} support is available through the concierge flow. Phone: {support_phone}. Email: {support_email}."
       ]
     },
@@ -186,7 +186,7 @@
       "keywords": ["booking confirmed", "payment", "paid", "confirm reservation", "reservation confirmed"],
       "answers": [
         "This assistant only serves guests with confirmed bookings. In Silkhaus flows, booking confirmation happens after payment is processed and confirmation details are issued.",
-        "Your demo booking {booking_id} is already confirmed. That is why I can show private stay details like access, Wi-Fi and checkout instructions."
+        "Your booking {booking_id} is already confirmed. That is why I can show private stay details like access, Wi-Fi and checkout instructions."
       ]
     }
   ],
@@ -222,19 +222,19 @@
       "Here is what is included in your move-in ready apartment:\n{facilities}"
     ],
     "ai_support_prompt": [
-      "{concierge_name} is ready. Ask one fixed demo question, for example:\n{ai_question_examples}",
-      "Ask me a Silkhaus support question. I can answer approved demo FAQs like:\n{ai_question_examples}",
-      "Sure. I can answer fixed Silkhaus FAQs with polished response variants. Try:\n{ai_question_examples}"
+      "{concierge_name} is ready. Ask me anything about your Silkhaus stay. For example:\n{ai_question_examples}",
+      "Ask me a Silkhaus support question. I can help with booking, access, amenities and support.\n{ai_question_examples}",
+      "Sure. Tell me what you need help with. You can ask things like:\n{ai_question_examples}"
     ],
     "ai_support_answer": [
-      "{ai_answer}\n\nYou can ask another fixed support question, or type menu.",
+      "{ai_answer}\n\nYou can ask another question, or type menu.",
       "Here is the answer from {concierge_name}:\n{ai_answer}\n\nAsk another question or type menu.",
-      "{ai_answer}\n\nI can keep answering Silkhaus support FAQs, or you can type menu."
+      "{ai_answer}\n\nI can keep helping with your Silkhaus stay, or you can type menu."
     ],
     "ai_support_unknown": [
-      "I can answer only approved Silkhaus demo FAQs right now. Try one of these:\n{ai_question_examples}",
-      "That question is outside this POC's fixed support set. Please ask one of:\n{ai_question_examples}",
-      "For the showcase, I answer fixed Silkhaus questions only. Examples:\n{ai_question_examples}"
+      "I could not answer that from your stay details yet. Try one of these:\n{ai_question_examples}",
+      "I want to make sure I answer accurately. Please ask one of these stay questions:\n{ai_question_examples}",
+      "I can help best with booking, access, amenities and support questions like:\n{ai_question_examples}"
     ],
     "nearby_category_prompt": [
       "Sure. What nearby place should I find around your current location?\n1. Grocery\n2. Medical / Pharmacy\n3. Mall / Shopping",
@@ -277,7 +277,7 @@
       "Share the apartment issue details now. Example: AC in bedroom is not cooling."
     ],
     "report_issue_confirm": [
-      "Thanks, I have noted this for {brand_name} support: {issue_summary}. The POC does not store reports, but this is where the support alert would be triggered.",
+      "Thanks, I have noted this for {brand_name} support: {issue_summary}. This is where the support alert would be triggered.",
       "Got it. Maintenance note prepared for {host_name}: {issue_summary}. In production this would create a ticket or team notification.",
       "I understand the issue: {issue_summary}. I would now pass this to the {brand_name} support team for action."
     ],
@@ -297,8 +297,8 @@
       "I found the route to {property_name}.\nDistance: {distance_text}\nETA: {duration_text}\n{maps_url}"
     ],
     "fallback": [
-      "I can help with check-in, Wi-Fi, parking, apartment amenities, nearby places, checkout, Silkhaus support, apartment issues, directions and fixed AI Support FAQs. Type menu to see options.",
-      "Please choose an option from the Silkhaus guest menu, or type AI Support to ask a fixed demo question.",
+      "I can help with check-in, Wi-Fi, parking, apartment amenities, nearby places, checkout, Silkhaus support, apartment issues, directions and AI Concierge questions. Type menu to see options.",
+      "Please choose an option from the Silkhaus guest menu, or type AI Concierge to ask about your stay.",
       "I did not match that message to a Silkhaus guest service. Send menu to pick from the available stay options."
     ]
   }

@@ -18,6 +18,13 @@ from app.services import clear_runtime_state, process_whatsapp_webhook_payload
 
 KNOWN_PHONE = "918459294241"
 UNKNOWN_PHONE = "919999009999"
+CLIENT_FACING_LEAK_WORDS = ["fixed", "faq", "rule-based", "poc", "llm", "approved"]
+
+
+def assert_client_facing_ai_copy(testcase: unittest.TestCase, text: str) -> None:
+    lowered = text.lower()
+    for word in CLIENT_FACING_LEAK_WORDS:
+        testcase.assertNotIn(word, lowered)
 
 
 class GuestAssistantApiTests(unittest.TestCase):
@@ -69,14 +76,15 @@ class GuestAssistantApiTests(unittest.TestCase):
         self.assertIn("nearby_places", row_ids)
         self.assertIn("ai_support", row_ids)
 
-    def test_ai_support_menu_option_prompts_fixed_questions(self) -> None:
-        response = receive_whatsapp_message_preview(MessagePreviewIn(phone=KNOWN_PHONE, text="AI Support"))
+    def test_ai_concierge_menu_option_prompts_guest_questions(self) -> None:
+        response = receive_whatsapp_message_preview(MessagePreviewIn(phone=KNOWN_PHONE, text="AI Concierge"))
 
         self.assertEqual(response["action"], "ai_support_prompt")
         self.assertIn("Silkhaus", response["reply"])
         self.assertIn("Can I extend my stay?", response["reply"])
+        assert_client_facing_ai_copy(self, response["reply"])
 
-    def test_direct_fixed_question_returns_ai_support_answer(self) -> None:
+    def test_direct_guest_question_returns_ai_concierge_answer(self) -> None:
         response = receive_whatsapp_message_preview(
             MessagePreviewIn(phone=KNOWN_PHONE, text="Can I extend my stay?")
         )
@@ -88,9 +96,10 @@ class GuestAssistantApiTests(unittest.TestCase):
             or "available" in response["reply"].lower()
             or "flexible" in response["reply"].lower()
         )
+        assert_client_facing_ai_copy(self, response["reply"])
 
-    def test_ai_support_session_prioritizes_fixed_faq_match(self) -> None:
-        receive_whatsapp_message_preview(MessagePreviewIn(phone=KNOWN_PHONE, text="AI Support"))
+    def test_ai_concierge_session_prioritizes_stay_answer(self) -> None:
+        receive_whatsapp_message_preview(MessagePreviewIn(phone=KNOWN_PHONE, text="AI Concierge"))
         response = receive_whatsapp_message_preview(
             MessagePreviewIn(phone=KNOWN_PHONE, text="Is Wi-Fi included?")
         )
@@ -98,6 +107,16 @@ class GuestAssistantApiTests(unittest.TestCase):
         self.assertEqual(response["action"], "ai_support_answer")
         self.assertEqual(response["question_id"], "wifi_included")
         self.assertIn("Silkhaus_Marina_Guest", response["reply"])
+        assert_client_facing_ai_copy(self, response["reply"])
+
+    def test_ai_concierge_unknown_question_does_not_expose_rule_source(self) -> None:
+        receive_whatsapp_message_preview(MessagePreviewIn(phone=KNOWN_PHONE, text="AI Concierge"))
+        response = receive_whatsapp_message_preview(
+            MessagePreviewIn(phone=KNOWN_PHONE, text="Can you book me a helicopter?")
+        )
+
+        self.assertEqual(response["action"], "ai_support_unknown")
+        assert_client_facing_ai_copy(self, response["reply"])
 
     def test_nearby_places_starts_live_category_flow(self) -> None:
         response = receive_whatsapp_message_preview(

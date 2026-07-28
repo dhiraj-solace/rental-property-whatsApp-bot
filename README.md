@@ -1,8 +1,8 @@
 # Silkhaus WhatsApp Concierge POC
 
-FastAPI backend for a Silkhaus-branded WhatsApp concierge for guests whose bookings are already confirmed.
+FastAPI backend for a Silkhaus-branded WhatsApp AI concierge for guests whose bookings are already confirmed.
 
-No AI or LLM is used in this POC. The assistant uses stored Silkhaus demo booking/property JSON, fixed FAQ matching and randomized approved response templates so replies feel conversational during a showcase.
+The assistant uses Silkhaus demo booking/property data, conversational support matching and randomized response variants so replies feel polished during a showcase.
 
 ## Features
 
@@ -18,7 +18,7 @@ No AI or LLM is used in this POC. The assistant uses stored Silkhaus demo bookin
 - Apartment issue showcase flow
 - Directions from guest location using Google Maps when `GOOGLE_MAPS_API_KEY` is configured
 - Meta WhatsApp Cloud API webhook support with interactive menu lists and category buttons
-- Fixed-question "Silkhaus AI Support" showcase, powered by rule-based FAQ matching
+- Silkhaus AI Concierge showcase for guest questions
 - WhatsApp preview endpoints for backend demos
 
 ## Structure
@@ -167,15 +167,15 @@ menu
 4 or facilities
 5 or nearby places
 6 or checkout
-7 or AI Support
+7 or AI Concierge
 8 or contact support
 9 or report issue
 10 or directions
 ```
 
-## Silkhaus AI Support Demo
+## Silkhaus AI Concierge Demo
 
-This POC includes a client-facing "Silkhaus AI Support" option. It does not call an AI API. It matches fixed approved questions and returns randomized answer variants.
+This POC includes a client-facing "Silkhaus AI Concierge" option for natural guest questions about the stay.
 
 Example questions:
 
@@ -191,7 +191,7 @@ When is my booking confirmed?
 
 For live nearby places, the assistant asks the guest to choose grocery, medical/pharmacy or mall, then asks for their current WhatsApp location. If `GOOGLE_MAPS_API_KEY` is configured, the backend calls Google Places Nearby Search API and returns live place names, addresses, ratings and Maps links. Without the API key, it returns a Google Maps search link for demo continuity.
 
-For maintenance, the assistant asks for one issue description and returns a host-ready acknowledgement. The POC does not persist issue reports.
+For maintenance, the assistant asks for one issue description and returns a support-ready acknowledgement.
 
 For directions, the assistant asks the guest to share their WhatsApp location. If `GOOGLE_MAPS_API_KEY` is configured, the backend calls Google Maps Distance Matrix API and returns distance, travel time and a Maps route link. Without the API key, it still returns a Google Maps route link for demo continuity.
 
