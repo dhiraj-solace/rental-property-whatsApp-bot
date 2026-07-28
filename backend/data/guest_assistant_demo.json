@@ -1,0 +1,213 @@
+{
+  "properties": [
+    {
+      "id": "goa_villa_001",
+      "name": "Casa Azul Beach Villa",
+      "address": "Candolim Beach Road, Goa 403515",
+      "location": {
+        "latitude": 15.5187,
+        "longitude": 73.7626
+      },
+      "check_in": {
+        "time": "2:00 PM",
+        "steps": [
+          "Reach the blue gate marked Casa Azul.",
+          "Enter lockbox code 4521.",
+          "Take the Villa A key and return the lockbox cover.",
+          "Keep one ID proof ready for host verification."
+        ]
+      },
+      "checkout": {
+        "time": "11:00 AM",
+        "steps": [
+          "Switch off AC units, geysers and kitchen appliances.",
+          "Leave used towels in the bathroom basket.",
+          "Lock the main door and place the key back in the lockbox.",
+          "Send a checkout message to the host before leaving."
+        ]
+      },
+      "wifi": {
+        "network": "CasaAzul_Guest",
+        "password": "BeachStay4521"
+      },
+      "parking": {
+        "summary": "One reserved car parking spot is available inside the blue gate. Extra two-wheelers can be parked near the security cabin."
+      },
+      "facilities": [
+        "Private pool open from 7:00 AM to 10:00 PM",
+        "Fully equipped kitchen with induction, microwave and fridge",
+        "Power backup for lights, fans and Wi-Fi",
+        "Smart TV with guest streaming access",
+        "Daily housekeeping between 10:00 AM and 12:00 PM"
+      ],
+      "host": {
+        "name": "Neha",
+        "phone": "+91 98765 43210",
+        "email": "host@example.com"
+      }
+    },
+    {
+      "id": "jaipur_apartment_002",
+      "name": "Pink City Heritage Apartment",
+      "address": "C Scheme, Jaipur 302001",
+      "location": {
+        "latitude": 26.9124,
+        "longitude": 75.7873
+      },
+      "check_in": {
+        "time": "3:00 PM",
+        "steps": [
+          "Tell security you are checking in to Flat 402.",
+          "Use lift B and collect the smart lock code from the host message.",
+          "Enter code 8042 followed by #.",
+          "Keep noise low after 10:00 PM as this is a residential building."
+        ]
+      },
+      "checkout": {
+        "time": "10:30 AM",
+        "steps": [
+          "Clear personal food items from the refrigerator.",
+          "Place the access card on the dining table.",
+          "Close all windows and lock the balcony door.",
+          "Message the host once you exit the apartment."
+        ]
+      },
+      "wifi": {
+        "network": "PinkCity_402",
+        "password": "JaipurGuest8042"
+      },
+      "parking": {
+        "summary": "Basement parking slot B-17 is reserved for your stay. Share your vehicle number with security on arrival."
+      },
+      "facilities": [
+        "Two air-conditioned bedrooms",
+        "RO water purifier",
+        "Washer-dryer",
+        "Workspace with monitor",
+        "Elevator access and 24-hour security"
+      ],
+      "host": {
+        "name": "Arjun",
+        "phone": "+91 91234 56780",
+        "email": "jaipurhost@example.com"
+      }
+    }
+  ],
+  "bookings": [
+    {
+      "booking_id": "BK-CASA-1001",
+      "guest_name": "Rahul",
+      "guest_phone": "919999000001",
+      "property_id": "goa_villa_001",
+      "check_in_date": "2026-08-01",
+      "check_out_date": "2026-08-04",
+      "status": "confirmed"
+    },
+    {
+      "booking_id": "BK-JAI-2042",
+      "guest_name": "Priya",
+      "guest_phone": "919999000002",
+      "property_id": "jaipur_apartment_002",
+      "check_in_date": "2026-09-12",
+      "check_out_date": "2026-09-15",
+      "status": "confirmed"
+    }
+  ],
+  "response_templates": {
+    "welcome": [
+      "Hi {guest_name}, welcome to {property_name}. Your confirmed stay is from {check_in_date} to {check_out_date}. How can I help?",
+      "Hello {guest_name}. I found your booking for {property_name}. Pick any option below and I will help right away.",
+      "Welcome back, {guest_name}. I have your {property_name} stay details ready. What would you like to check?"
+    ],
+    "unknown_guest": [
+      "I could not find a confirmed booking for this WhatsApp number. Please contact the host or send the registered guest number.",
+      "This number is not linked with an active confirmed stay in the demo data. Please contact your host for help.",
+      "I am unable to match this WhatsApp number with a confirmed booking. The host can verify and assist you manually."
+    ],
+    "check_in": [
+      "Your check-in is from {check_in_time} on {check_in_date}.\n\n{check_in_steps}",
+      "Here are the check-in steps for {property_name}:\n\n{check_in_steps}\n\nCheck-in time: {check_in_time}.",
+      "You are all set for check-in at {property_name}. Please follow these steps:\n\n{check_in_steps}"
+    ],
+    "wifi": [
+      "Sure. Wi-Fi details:\nNetwork: {wifi_network}\nPassword: {wifi_password}",
+      "You can connect to the property Wi-Fi using:\nNetwork: {wifi_network}\nPassword: {wifi_password}",
+      "Wi-Fi is available at {property_name}.\nNetwork: {wifi_network}\nPassword: {wifi_password}"
+    ],
+    "parking": [
+      "Parking information for {property_name}: {parking_summary}",
+      "Yes, parking is covered for your stay. {parking_summary}",
+      "Here is the parking note: {parking_summary}"
+    ],
+    "facilities": [
+      "Facilities available during your stay:\n{facilities}",
+      "{property_name} includes these guest facilities:\n{facilities}",
+      "Here is what you can use at the property:\n{facilities}"
+    ],
+    "nearby_category_prompt": [
+      "Sure. What nearby place do you want me to find?\n1. Grocery\n2. Medical / Pharmacy\n3. Mall / Shopping",
+      "I can search live places around your current location. Please choose: grocery, medical or mall.",
+      "Tell me the nearby category you need: grocery, medical/pharmacy or mall."
+    ],
+    "nearby_category_invalid": [
+      "Please choose one nearby category: grocery, medical or mall.",
+      "I can search grocery, medical/pharmacy or mall. Which one do you need?",
+      "Please reply with grocery, medical or mall so I can continue."
+    ],
+    "nearby_location_prompt": [
+      "Great, please share your current WhatsApp location and I will find nearby {nearby_category} options.",
+      "Send your current location pin now. I will search live {nearby_category} places around you.",
+      "Please share your WhatsApp location so I can find nearby {nearby_category} places."
+    ],
+    "nearby_need_location": [
+      "I need your shared WhatsApp location to search live nearby {nearby_category} places.",
+      "Please send a location pin, not text, so I can search nearby {nearby_category} options.",
+      "Share your current location and I will find nearby {nearby_category} places."
+    ],
+    "nearby_live_result": [
+      "Nearby {nearby_category} options around your current location:\n\n{nearby_results}",
+      "I found these live {nearby_category} results near you:\n\n{nearby_results}",
+      "Here are nearby {nearby_category} places from your shared location:\n\n{nearby_results}"
+    ],
+    "checkout": [
+      "Checkout is by {checkout_time} on {check_out_date}.\n\n{checkout_steps}",
+      "Before you leave {property_name}, please follow these checkout steps:\n\n{checkout_steps}",
+      "Your checkout time is {checkout_time}. Quick checklist:\n\n{checkout_steps}"
+    ],
+    "contact_host": [
+      "Your host is {host_name}.\nPhone: {host_phone}\nEmail: {host_email}",
+      "For direct help, contact {host_name} at {host_phone}. Email: {host_email}",
+      "Host contact for your stay:\n{host_name} - {host_phone}\n{host_email}"
+    ],
+    "report_issue_prompt": [
+      "Please describe the maintenance issue in one message. I will format it for the host.",
+      "Tell me what is not working or needs attention, and include the room or area if possible.",
+      "Share the maintenance issue details now. Example: AC in bedroom is not cooling."
+    ],
+    "report_issue_confirm": [
+      "Thanks, I have noted this for the host: {issue_summary}. The POC does not store reports, but this is where the host alert would be triggered.",
+      "Got it. Maintenance note prepared for {host_name}: {issue_summary}. In production this would create a ticket or host notification.",
+      "I understand the issue: {issue_summary}. I would now pass this to the host team for action."
+    ],
+    "directions_request_location": [
+      "Please share your current WhatsApp location and I will calculate distance, travel time and a Maps route to {property_name}.",
+      "Send your live/current location from WhatsApp. I will return the route to {property_address}.",
+      "To get real directions, share your current location here and I will prepare the Maps link."
+    ],
+    "directions_need_location": [
+      "I need your shared WhatsApp location for live directions. Please use WhatsApp's location share option.",
+      "Please send a location pin, not text, so I can calculate distance and travel time.",
+      "Directions need your current location. Share your location and I will handle the route."
+    ],
+    "directions_result": [
+      "Route to {property_name}:\nDistance: {distance_text}\nEstimated time: {duration_text}\nMaps: {maps_url}",
+      "Here are your directions for {property_address}:\nDistance: {distance_text}\nTravel time: {duration_text}\nOpen: {maps_url}",
+      "I found the route to {property_name}.\nDistance: {distance_text}\nETA: {duration_text}\n{maps_url}"
+    ],
+    "fallback": [
+      "I can help with check-in, Wi-Fi, parking, facilities, nearby places, checkout, host contact, maintenance and directions. Type menu to see options.",
+      "Please choose an option from the guest menu, or type menu and I will show everything again.",
+      "I did not match that message to a guest service. Send menu to pick from the available stay options."
+    ]
+  }
+}
