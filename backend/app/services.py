@@ -7,6 +7,7 @@ import random
 import urllib.error
 import urllib.parse
 import urllib.request
+from contextvars import ContextVar
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -100,6 +101,10 @@ TEXT_ALIASES = {
 
 _SESSIONS: dict[str, dict[str, Any]] = {}
 _DEMO_CACHE: dict[str, Any] | None = None
+_CURRENT_WHATSAPP_PHONE_NUMBER_ID: ContextVar[str | None] = ContextVar(
+    "current_whatsapp_phone_number_id",
+    default=None,
+)
 
 
 class SafeFormatDict(dict):
@@ -135,16 +140,6 @@ def clear_runtime_state() -> None:
 
 def send_whatsapp_text(to_phone: str, body: str) -> dict[str, Any]:
     to_phone = normalize_phone(to_phone)
-    provider = whatsapp_provider()
-    logger.info("whatsapp_send_start provider=%s to=%s body_chars=%s", provider, to_phone, len(body))
-    phone_number_id = os.getenv("WHATSAPP_PHONE_NUMBER_ID", "").strip()
-    access_token = os.getenv("WHATSAPP_ACCESS_TOKEN", "").strip()
-    graph_version = os.getenv("WHATSAPP_GRAPH_API_VERSION", "v20.0").strip() or "v20.0"
-    if not phone_number_id or not access_token:
-        logger.warning("whatsapp_send_meta_not_configured to=%s", to_phone)
-        return {"delivery_status": "meta_not_configured", "provider_message_id": None, "body": body}
-
-    url = f"https://graph.facebook.com/{graph_version}/{phone_number_id}/messages"
     request_body = {
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
@@ -152,6 +147,92 @@ def send_whatsapp_text(to_phone: str, body: str) -> dict[str, Any]:
         "type": "text",
         "text": {"preview_url": True, "body": body},
     }
+    return send_whatsapp_payload(to_phone, request_body, body)
+
+
+def send_whatsapp_buttons(
+    to_phone: str,
+    body: str,
+    buttons: list[dict[str, str]],
+) -> dict[str, Any]:
+    to_phone = normalize_phone(to_phone)
+    request_body = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": to_phone,
+        "type": "interactive",
+        "interactive": {
+            "type": "button",
+            "body": {"text": body[:1024]},
+            "action": {
+                "buttons": [
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": button["id"][:256],
+                            "title": button["title"][:20],
+                        },
+                    }
+                    for button in buttons[:3]
+                ]
+            },
+        },
+    }
+    return send_whatsapp_payload(to_phone, request_body, body)
+
+
+def send_whatsapp_list(
+    to_phone: str,
+    body: str,
+    button_text: str,
+    sections: list[dict[str, Any]],
+) -> dict[str, Any]:
+    to_phone = normalize_phone(to_phone)
+    request_body = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": to_phone,
+        "type": "interactive",
+        "interactive": {
+            "type": "list",
+            "body": {"text": body[:1024]},
+            "action": {
+                "button": button_text[:20],
+                "sections": sections[:10],
+            },
+        },
+    }
+    return send_whatsapp_payload(to_phone, request_body, body)
+
+
+def send_whatsapp_payload(
+    to_phone: str,
+    request_body: dict[str, Any],
+    log_body: str,
+) -> dict[str, Any]:
+    provider = whatsapp_provider()
+    logger.info("whatsapp_send_start provider=%s to=%s body_chars=%s", provider, to_phone, len(log_body))
+    phone_number_id = (
+        _CURRENT_WHATSAPP_PHONE_NUMBER_ID.get()
+        or os.getenv("WHATSAPP_PHONE_NUMBER_ID", "").strip()
+    )
+    access_token = os.getenv("WHATSAPP_ACCESS_TOKEN", "").strip()
+    graph_version = os.getenv("WHATSAPP_GRAPH_API_VERSION", "v20.0").strip() or "v20.0"
+    logger.info(
+        "whatsapp_send_sender phone_number_id=%s source=%s message_type=%s",
+        phone_number_id or "missing",
+        "webhook_metadata" if _CURRENT_WHATSAPP_PHONE_NUMBER_ID.get() else "env",
+        request_body.get("type"),
+    )
+    if not phone_number_id or not access_token:
+        logger.warning("whatsapp_send_meta_not_configured to=%s", to_phone)
+        return {
+            "delivery_status": "meta_not_configured",
+            "provider_message_id": None,
+            "request_body": request_body,
+        }
+
+    url = f"https://graph.facebook.com/{graph_version}/{phone_number_id}/messages"
     request = urllib.request.Request(
         url,
         data=json.dumps(request_body).encode("utf-8"),
@@ -236,6 +317,35 @@ def menu_text(values: dict[str, Any]) -> str:
     return pick_reply("welcome", values) + "\n\n" + "\n".join(rows)
 
 
+def menu_sections() -> list[dict[str, Any]]:
+    return [
+        {
+            "title": "Stay Info",
+            "rows": [
+                {"id": "check_in", "title": "Check-in instructions", "description": "Arrival and access details"},
+                {"id": "wifi", "title": "Wi-Fi details", "description": "Network and password"},
+                {"id": "parking", "title": "Parking information", "description": "Where to park"},
+                {"id": "facilities", "title": "Property facilities", "description": "Amenities included"},
+                {"id": "checkout", "title": "Checkout instructions", "description": "Departure checklist"},
+            ],
+        },
+        {
+            "title": "Help",
+            "rows": [
+                {"id": "nearby_places", "title": "Live nearby places", "description": "Grocery, medical or mall"},
+                {"id": "contact_host", "title": "Contact host", "description": "Host phone and email"},
+                {"id": "report_issue", "title": "Report maintenance issue", "description": "Send an issue to host"},
+                {"id": "directions", "title": "Get directions", "description": "Route to the property"},
+            ],
+        },
+    ]
+
+
+def send_guest_menu(phone: str, values: dict[str, Any]) -> dict[str, Any]:
+    body = pick_reply("welcome", values)
+    return send_whatsapp_list(phone, body, "Open menu", menu_sections())
+
+
 def menu_payload(phone: str) -> dict[str, Any]:
     context = guest_context(phone)
     if not context:
@@ -270,6 +380,9 @@ def get_session(phone: str) -> dict[str, Any]:
 
 
 def resolve_intent(text: str) -> str | None:
+    raw = text.strip()
+    if raw in MENU_OPTIONS or raw.startswith("nearby_category:"):
+        return raw
     cleaned = " ".join(text.strip().lower().replace("_", " ").split())
     if cleaned in TEXT_ALIASES:
         return TEXT_ALIASES[cleaned]
@@ -383,12 +496,23 @@ def directions_response(
 def start_nearby_flow(phone: str, values: dict[str, Any]) -> dict[str, Any]:
     remember_session(phone, pending_action="live_nearby_category", nearby_category=None)
     reply = pick_reply("nearby_category_prompt", values)
-    delivery = send_whatsapp_text(phone, reply)
+    delivery = send_whatsapp_buttons(
+        phone,
+        reply,
+        [
+            {"id": "nearby_category:grocery", "title": "Grocery"},
+            {"id": "nearby_category:medical", "title": "Medical"},
+            {"id": "nearby_category:mall", "title": "Mall"},
+        ],
+    )
     return {"action": "nearby_category_prompt", "reply": reply, "delivery": delivery}
 
 
 def normalize_nearby_category(value: str | None) -> str | None:
-    cleaned = " ".join((value or "").strip().lower().replace("_", " ").split())
+    cleaned = (value or "").strip().lower()
+    if cleaned.startswith("nearby_category:"):
+        cleaned = cleaned.split(":", 1)[1]
+    cleaned = " ".join(cleaned.replace("_", " ").split())
     if cleaned in {"1", "grocery", "groceries", "supermarket", "store", "food store"}:
         return "grocery"
     if cleaned in {"2", "medical", "medicine", "pharmacy", "hospital", "doctor", "clinic"}:
@@ -594,6 +718,14 @@ def answer_intent(phone: str, intent: str) -> dict[str, Any]:
         return choose_nearby_category(phone, intent.split(":", 1)[1])
     if intent == "menu":
         reply = menu_text(values)
+        delivery = send_guest_menu(phone, values)
+        return {
+            "action": intent,
+            "reply": reply,
+            "delivery": delivery,
+            "booking_id": context["booking"].get("booking_id"),
+            "property_id": context["property"].get("id"),
+        }
     elif intent == "report_issue":
         remember_session(phone, pending_action="report_issue")
         reply = pick_reply("report_issue_prompt", values)
@@ -746,6 +878,9 @@ def process_whatsapp_webhook_payload(payload: dict[str, Any]) -> list[dict[str, 
     for entry in payload.get("entry") or []:
         for change in entry.get("changes") or []:
             value = change.get("value") or {}
+            metadata = value.get("metadata") or {}
+            receiving_phone_number_id = str(metadata.get("phone_number_id") or "").strip() or None
+            display_phone_number = str(metadata.get("display_phone_number") or "").strip() or None
             for status in value.get("statuses") or []:
                 logger.info("webhook_status provider_message_id=%s status=%s", status.get("id"), status.get("status"))
                 results.append({"action": "message_status", "status": status.get("status"), "provider_message_id": status.get("id")})
@@ -754,7 +889,14 @@ def process_whatsapp_webhook_payload(payload: dict[str, Any]) -> list[dict[str, 
                 if not phone:
                     continue
                 message = _normalize_webhook_message(raw_message)
-                results.append(process_incoming_whatsapp_message(phone, message, raw_message.get("id")))
+                token = _CURRENT_WHATSAPP_PHONE_NUMBER_ID.set(receiving_phone_number_id)
+                try:
+                    result = process_incoming_whatsapp_message(phone, message, raw_message.get("id"))
+                finally:
+                    _CURRENT_WHATSAPP_PHONE_NUMBER_ID.reset(token)
+                result["receiving_phone_number_id"] = receiving_phone_number_id
+                result["display_phone_number"] = display_phone_number
+                results.append(result)
     return results
 
 

@@ -17,7 +17,7 @@ No AI or LLM is used in this POC. The assistant uses stored demo booking/propert
 - Contact host
 - Maintenance issue showcase flow
 - Directions from guest location using Google Maps when `GOOGLE_MAPS_API_KEY` is configured
-- Meta WhatsApp Cloud API webhook support
+- Meta WhatsApp Cloud API webhook support with interactive menu lists and category buttons
 - WhatsApp preview endpoints for backend demos
 
 ## Structure
@@ -77,7 +77,7 @@ The demo data is stored in `backend/data/guest_assistant_demo.json`.
 Known guest numbers:
 
 ```text
-919999000001 - Rahul - Casa Azul Beach Villa
+918459294241 - Dhiraj Rajput - Casa Azul Beach Villa
 919999000002 - Priya - Pink City Heritage Apartment
 ```
 
@@ -88,7 +88,7 @@ Unknown numbers receive a booking-not-found response.
 Open the menu preview:
 
 ```http
-GET /api/whatsapp/menu-preview?phone=919999000001
+GET /api/whatsapp/menu-preview?phone=918459294241
 ```
 
 Preview a guest message:
@@ -100,7 +100,7 @@ Content-Type: application/json
 
 ```json
 {
-  "phone": "919999000001",
+  "phone": "918459294241",
   "text": "wifi"
 }
 ```
@@ -114,7 +114,7 @@ Content-Type: application/json
 
 ```json
 {
-  "phone": "919999000001",
+  "phone": "918459294241",
   "action": "nearby_places"
 }
 ```
@@ -130,7 +130,7 @@ Content-Type: application/json
 
 ```json
 {
-  "phone": "919999000001",
+  "phone": "918459294241",
   "category": "grocery",
   "latitude": 15.4909,
   "longitude": 73.8278,
@@ -147,7 +147,7 @@ Content-Type: application/json
 
 ```json
 {
-  "phone": "919999000001",
+  "phone": "918459294241",
   "latitude": 15.4909,
   "longitude": 73.8278,
   "travel_mode": "driving"
@@ -156,7 +156,7 @@ Content-Type: application/json
 
 ## WhatsApp Commands
 
-Guests can type:
+In WhatsApp, guests receive an interactive list for the main menu and quick-reply buttons for nearby categories. Text commands still work as fallback:
 
 ```text
 menu
@@ -182,7 +182,6 @@ For directions, the assistant asks the guest to share their WhatsApp location. I
 Set these environment variables for a real WhatsApp POC:
 
 ```text
-WHATSAPP_PROVIDER=meta
 WHATSAPP_VERIFY_TOKEN=your_verify_token
 WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id
 WHATSAPP_ACCESS_TOKEN=your_access_token

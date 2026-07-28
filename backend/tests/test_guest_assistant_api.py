@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import unittest
+from unittest.mock import patch
 
 from app.main import (
     directions_preview,
@@ -15,7 +16,7 @@ from app.schemas import DirectionPreviewIn, MessagePreviewIn, NearbyPreviewIn, S
 from app.services import clear_runtime_state, process_whatsapp_webhook_payload
 
 
-KNOWN_PHONE = "919999000001"
+KNOWN_PHONE = "918459294241"
 UNKNOWN_PHONE = "919999009999"
 
 
@@ -23,6 +24,8 @@ class GuestAssistantApiTests(unittest.TestCase):
     def setUp(self) -> None:
         clear_runtime_state()
         os.environ.pop("GOOGLE_MAPS_API_KEY", None)
+        os.environ.pop("WHATSAPP_PHONE_NUMBER_ID", None)
+        os.environ.pop("WHATSAPP_ACCESS_TOKEN", None)
 
     def test_known_guest_receives_personal_menu(self) -> None:
         response = get_menu_preview(KNOWN_PHONE)
@@ -49,6 +52,22 @@ class GuestAssistantApiTests(unittest.TestCase):
         self.assertIn("CasaAzul_Guest", response["reply"])
         self.assertIn("BeachStay4521", response["reply"])
 
+    def test_menu_message_sends_whatsapp_interactive_list(self) -> None:
+        response = receive_whatsapp_message_preview(MessagePreviewIn(phone=KNOWN_PHONE, text="hi"))
+
+        request_body = response["delivery"]["request_body"]
+        self.assertEqual(response["action"], "menu")
+        self.assertEqual(request_body["type"], "interactive")
+        self.assertEqual(request_body["interactive"]["type"], "list")
+        self.assertEqual(request_body["interactive"]["action"]["button"], "Open menu")
+        row_ids = [
+            row["id"]
+            for section in request_body["interactive"]["action"]["sections"]
+            for row in section["rows"]
+        ]
+        self.assertIn("wifi", row_ids)
+        self.assertIn("nearby_places", row_ids)
+
     def test_nearby_places_starts_live_category_flow(self) -> None:
         response = receive_whatsapp_message_preview(
             MessagePreviewIn(phone=KNOWN_PHONE, text="nearby places")
@@ -57,6 +76,17 @@ class GuestAssistantApiTests(unittest.TestCase):
         self.assertEqual(response["action"], "nearby_category_prompt")
         self.assertIn("grocery", response["reply"].lower())
         self.assertIn("medical", response["reply"].lower())
+        request_body = response["delivery"]["request_body"]
+        self.assertEqual(request_body["type"], "interactive")
+        self.assertEqual(request_body["interactive"]["type"], "button")
+        button_ids = [
+            button["reply"]["id"]
+            for button in request_body["interactive"]["action"]["buttons"]
+        ]
+        self.assertEqual(
+            button_ids,
+            ["nearby_category:grocery", "nearby_category:medical", "nearby_category:mall"],
+        )
 
     def test_nearby_category_asks_for_guest_location(self) -> None:
         receive_whatsapp_message_preview(MessagePreviewIn(phone=KNOWN_PHONE, text="nearby places"))
@@ -65,6 +95,40 @@ class GuestAssistantApiTests(unittest.TestCase):
         self.assertEqual(response["action"], "nearby_location_prompt")
         self.assertEqual(response["category"], "grocery")
         self.assertIn("location", response["reply"].lower())
+
+    def test_interactive_nearby_category_button_asks_for_guest_location(self) -> None:
+        receive_whatsapp_message_preview(MessagePreviewIn(phone=KNOWN_PHONE, text="nearby places"))
+        payload = {
+            "entry": [
+                {
+                    "changes": [
+                        {
+                            "value": {
+                                "messages": [
+                                    {
+                                        "id": "wamid.demo.nearby.button",
+                                        "from": KNOWN_PHONE,
+                                        "type": "interactive",
+                                        "interactive": {
+                                            "button_reply": {
+                                                "id": "nearby_category:grocery",
+                                                "title": "Grocery",
+                                            }
+                                        },
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+
+        results = process_whatsapp_webhook_payload(payload)
+
+        self.assertEqual(results[0]["action"], "nearby_location_prompt")
+        self.assertEqual(results[0]["category"], "grocery")
+        self.assertIn("location", results[0]["reply"].lower())
 
     def test_nearby_preview_returns_maps_search_link_without_api_key(self) -> None:
         response = nearby_preview(
@@ -204,6 +268,49 @@ class GuestAssistantApiTests(unittest.TestCase):
 
         self.assertEqual(results[0]["action"], "check_in")
         self.assertIn("4521", results[0]["reply"])
+
+    def test_webhook_reply_uses_receiving_phone_number_id(self) -> None:
+        payload = {
+            "entry": [
+                {
+                    "changes": [
+                        {
+                            "value": {
+                                "metadata": {
+                                    "display_phone_number": "918000000000",
+                                    "phone_number_id": "real_business_phone_id",
+                                },
+                                "messages": [
+                                    {
+                                        "id": "wamid.demo.same.sender",
+                                        "from": KNOWN_PHONE,
+                                        "type": "text",
+                                        "text": {"body": "wifi"},
+                                    }
+                                ],
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+
+        with patch.dict(
+            os.environ,
+            {
+                "WHATSAPP_PHONE_NUMBER_ID": "wrong_env_phone_id",
+                "WHATSAPP_ACCESS_TOKEN": "demo-token",
+            },
+            clear=False,
+        ):
+            with patch("app.services.urllib.request.urlopen") as urlopen:
+                urlopen.return_value.__enter__.return_value.read.return_value = b'{"messages":[{"id":"wamid.out"}]}'
+                results = process_whatsapp_webhook_payload(payload)
+
+        request = urlopen.call_args.args[0]
+        self.assertIn("/real_business_phone_id/messages", request.full_url)
+        self.assertEqual(results[0]["display_phone_number"], "918000000000")
+        self.assertEqual(results[0]["receiving_phone_number_id"], "real_business_phone_id")
 
     def test_guest_profile_exposes_demo_context_for_showcase(self) -> None:
         response = guest_profile(KNOWN_PHONE)

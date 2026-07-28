@@ -55,7 +55,7 @@ def root() -> dict:
         "status": "ok",
         "health": "/health",
         "docs": "/docs",
-        "menu_preview": "/api/whatsapp/menu-preview?phone=919999000001",
+        "menu_preview": "/api/whatsapp/menu-preview?phone=918459294241",
     }
 
 

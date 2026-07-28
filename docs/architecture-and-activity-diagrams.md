@@ -13,9 +13,9 @@ flowchart LR
     Maps["Google Maps APIs<br/>Places + Distance"]
     Host["Host / Property Team"]
 
-    Guest -->|"Menu, questions, location"| Meta
+    Guest -->|"Menu taps, questions, location"| Meta
     Meta -->|"Webhook events"| API
-    API -->|"Text replies"| Meta
+    API -->|"Text / interactive replies"| Meta
     Meta -->|"Assistant response"| Guest
 
     API -->|"Read only"| Data
@@ -29,7 +29,7 @@ flowchart LR
 | --- | --- |
 | Guest | Uses WhatsApp to request stay information. |
 | Meta WhatsApp Cloud API | Delivers inbound guest messages and outbound assistant replies. |
-| FastAPI Backend | Handles webhook verification, message parsing, guest lookup, menu routing, template selection and Maps calls. |
+| FastAPI Backend | Handles webhook verification, message parsing, guest lookup, interactive menu routing, template selection and Maps calls. |
 | Demo JSON | Stores confirmed bookings, property instructions and randomized reply templates. |
 | Google Maps APIs | Return live nearby places, distance and travel time when a guest shares location. |
 | Host | Receives the maintenance issue in the production version; this POC only showcases the acknowledgement. |
@@ -40,9 +40,9 @@ flowchart LR
 flowchart TD
     Start([Guest sends Hi / menu]) --> Lookup{"Phone linked to confirmed booking?"}
     Lookup -->|"No"| Unknown["Return booking-not-found message"]
-    Lookup -->|"Yes"| Menu["Return personalized guest menu"]
+    Lookup -->|"Yes"| Menu["Return personalized interactive menu"]
 
-    Menu --> Action{"Guest selects option"}
+    Menu --> Action{"Guest taps list option or types fallback"}
     Action --> CheckIn["Check-in instructions"]
     Action --> Wifi["Wi-Fi details"]
     Action --> Parking["Parking information"]
@@ -56,7 +56,7 @@ flowchart TD
     Issue --> IssueText["Guest describes issue"]
     IssueText --> IssueAck["Return host-ready acknowledgement"]
 
-    Nearby --> NearbyCategory["Guest chooses grocery, medical or mall"]
+    Nearby --> NearbyCategory["Guest taps grocery, medical or mall button"]
     NearbyCategory --> NearbyLocation["Guest shares WhatsApp location"]
     NearbyLocation --> Places{"Google Maps key configured?"}
     Places -->|"Yes"| LivePlaces["Return live places with Maps links"]
@@ -74,7 +74,7 @@ flowchart TD
 | --- | --- | --- |
 | Health | `GET /health` | Confirms assistant status and demo configuration. |
 | WhatsApp verify | `GET /webhook/whatsapp` | Used by Meta to verify the callback URL. |
-| WhatsApp receive | `POST /webhook/whatsapp` | Receives WhatsApp messages, buttons, locations and status updates. |
+| WhatsApp receive | `POST /webhook/whatsapp` | Receives WhatsApp messages, list replies, button replies, locations and status updates. |
 | Menu preview | `GET /api/whatsapp/menu-preview` | Shows the menu for a demo phone number. |
 | Message preview | `POST /api/whatsapp/message-preview` | Previews a guest text message flow. |
 | Select preview | `POST /api/whatsapp/select-preview` | Previews a menu/button action. |
@@ -122,6 +122,7 @@ Completed:
 - Rule-based WhatsApp guest assistant.
 - Randomized approved response variants.
 - Confirmed guest lookup from JSON.
+- WhatsApp interactive list menu and nearby category buttons.
 - Check-in, Wi-Fi, parking, facilities, live nearby places, checkout and host contact.
 - Maintenance issue acknowledgement without storage.
 - Location-based Google Places nearby search with search-link fallback.
