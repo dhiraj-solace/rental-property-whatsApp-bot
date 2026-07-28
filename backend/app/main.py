@@ -34,7 +34,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("guest_assistant.api")
 
-app = FastAPI(title="WhatsApp Guest Assistant POC", version="0.2.0")
+app = FastAPI(title="Silkhaus WhatsApp Concierge POC", version="0.3.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -51,7 +51,7 @@ app.add_middleware(
 @app.get("/")
 def root() -> dict:
     return {
-        "name": "WhatsApp Guest Assistant POC",
+        "name": "Silkhaus WhatsApp Concierge POC",
         "status": "ok",
         "health": "/health",
         "docs": "/docs",
@@ -64,9 +64,10 @@ def health() -> dict:
     data = load_demo_data()
     return {
         "status": "ok",
-        "assistant": "guest_assistant",
+        "assistant": "silkhaus_concierge",
         "ai_enabled": False,
         "reply_style": "rule_based_random_templates",
+        "ai_support_mode": "fixed_question_rule_based",
         "whatsapp_provider": whatsapp_provider(),
         "demo_data_path": str(DEMO_DATA_PATH),
         "properties": len(data.get("properties", [])),

@@ -31,10 +31,10 @@ class GuestAssistantApiTests(unittest.TestCase):
         response = get_menu_preview(KNOWN_PHONE)
 
         self.assertTrue(response["known_guest"])
-        self.assertEqual(response["booking"]["booking_id"], "BK-CASA-1001")
-        self.assertEqual(response["property"]["name"], "Casa Azul Beach Villa")
-        self.assertEqual(len(response["options"]), 9)
-        self.assertIn("Casa Azul Beach Villa", response["reply"])
+        self.assertEqual(response["booking"]["booking_id"], "SH-DXB-1001")
+        self.assertEqual(response["property"]["name"], "Silkhaus Dubai Marina Premium Apartment")
+        self.assertEqual(len(response["options"]), 10)
+        self.assertIn("Silkhaus", response["reply"])
 
     def test_unknown_guest_gets_booking_fallback(self) -> None:
         response = get_menu_preview(UNKNOWN_PHONE)
@@ -49,8 +49,8 @@ class GuestAssistantApiTests(unittest.TestCase):
         response = select_whatsapp_option_preview(SelectPreviewIn(phone=KNOWN_PHONE, action="wifi"))
 
         self.assertEqual(response["action"], "wifi")
-        self.assertIn("CasaAzul_Guest", response["reply"])
-        self.assertIn("BeachStay4521", response["reply"])
+        self.assertIn("Silkhaus_Marina_Guest", response["reply"])
+        self.assertIn("Silkhaus4521", response["reply"])
 
     def test_menu_message_sends_whatsapp_interactive_list(self) -> None:
         response = receive_whatsapp_message_preview(MessagePreviewIn(phone=KNOWN_PHONE, text="hi"))
@@ -67,6 +67,37 @@ class GuestAssistantApiTests(unittest.TestCase):
         ]
         self.assertIn("wifi", row_ids)
         self.assertIn("nearby_places", row_ids)
+        self.assertIn("ai_support", row_ids)
+
+    def test_ai_support_menu_option_prompts_fixed_questions(self) -> None:
+        response = receive_whatsapp_message_preview(MessagePreviewIn(phone=KNOWN_PHONE, text="AI Support"))
+
+        self.assertEqual(response["action"], "ai_support_prompt")
+        self.assertIn("Silkhaus", response["reply"])
+        self.assertIn("Can I extend my stay?", response["reply"])
+
+    def test_direct_fixed_question_returns_ai_support_answer(self) -> None:
+        response = receive_whatsapp_message_preview(
+            MessagePreviewIn(phone=KNOWN_PHONE, text="Can I extend my stay?")
+        )
+
+        self.assertEqual(response["action"], "ai_support_answer")
+        self.assertEqual(response["question_id"], "flexible_stays")
+        self.assertTrue(
+            "extension" in response["reply"].lower()
+            or "available" in response["reply"].lower()
+            or "flexible" in response["reply"].lower()
+        )
+
+    def test_ai_support_session_prioritizes_fixed_faq_match(self) -> None:
+        receive_whatsapp_message_preview(MessagePreviewIn(phone=KNOWN_PHONE, text="AI Support"))
+        response = receive_whatsapp_message_preview(
+            MessagePreviewIn(phone=KNOWN_PHONE, text="Is Wi-Fi included?")
+        )
+
+        self.assertEqual(response["action"], "ai_support_answer")
+        self.assertEqual(response["question_id"], "wifi_included")
+        self.assertIn("Silkhaus_Marina_Guest", response["reply"])
 
     def test_nearby_places_starts_live_category_flow(self) -> None:
         response = receive_whatsapp_message_preview(
@@ -170,8 +201,8 @@ class GuestAssistantApiTests(unittest.TestCase):
         self.assertFalse(response["directions"]["configured"])
         self.assertIn("https://www.google.com/maps/dir/", response["directions"]["maps_url"])
         self.assertTrue(
-            "Casa Azul Beach Villa" in response["reply"]
-            or "Candolim Beach Road" in response["reply"]
+            "Silkhaus Dubai Marina Premium Apartment" in response["reply"]
+            or "Dubai Marina" in response["reply"]
         )
 
     def test_webhook_location_message_triggers_directions_flow(self) -> None:
@@ -316,7 +347,7 @@ class GuestAssistantApiTests(unittest.TestCase):
         response = guest_profile(KNOWN_PHONE)
 
         self.assertTrue(response["known_guest"])
-        self.assertEqual(response["property"]["id"], "goa_villa_001")
+        self.assertEqual(response["property"]["id"], "silkhaus_dubai_marina_001")
         self.assertEqual(response["available_actions"][0]["id"], "check_in")
 
 

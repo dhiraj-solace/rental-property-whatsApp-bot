@@ -1,23 +1,24 @@
-# WhatsApp Guest Assistant POC
+# Silkhaus WhatsApp Concierge POC
 
-FastAPI backend for a rule-based WhatsApp assistant for guests whose bookings are already confirmed.
+FastAPI backend for a Silkhaus-branded WhatsApp concierge for guests whose bookings are already confirmed.
 
-No AI or LLM is used in this POC. The assistant uses stored demo booking/property JSON and randomized approved response templates so replies feel conversational during a showcase.
+No AI or LLM is used in this POC. The assistant uses stored Silkhaus demo booking/property JSON, fixed FAQ matching and randomized approved response templates so replies feel conversational during a showcase.
 
 ## Features
 
-- Welcome message and guest menu
+- Silkhaus-branded welcome message and guest menu
 - Confirmed guest lookup by WhatsApp phone number
-- Check-in instructions
+- Self check-in and access instructions
 - Wi-Fi details
 - Parking information
-- Property facilities
+- Apartment amenities
 - Live nearby places from guest location for grocery, medical/pharmacy and mall searches
 - Checkout instructions
-- Contact host
-- Maintenance issue showcase flow
+- Contact Silkhaus support
+- Apartment issue showcase flow
 - Directions from guest location using Google Maps when `GOOGLE_MAPS_API_KEY` is configured
 - Meta WhatsApp Cloud API webhook support with interactive menu lists and category buttons
+- Fixed-question "Silkhaus AI Support" showcase, powered by rule-based FAQ matching
 - WhatsApp preview endpoints for backend demos
 
 ## Structure
@@ -77,8 +78,8 @@ The demo data is stored in `backend/data/guest_assistant_demo.json`.
 Known guest numbers:
 
 ```text
-918459294241 - Dhiraj Rajput - Casa Azul Beach Villa
-919999000002 - Priya - Pink City Heritage Apartment
+918459294241 - Dhiraj Rajput - Silkhaus Dubai Marina Premium Apartment
+919999000002 - Priya - Silkhaus Yas Island Serviced Apartment
 ```
 
 Unknown numbers receive a booking-not-found response.
@@ -166,9 +167,26 @@ menu
 4 or facilities
 5 or nearby places
 6 or checkout
-7 or contact host
-8 or report issue
-9 or directions
+7 or AI Support
+8 or contact support
+9 or report issue
+10 or directions
+```
+
+## Silkhaus AI Support Demo
+
+This POC includes a client-facing "Silkhaus AI Support" option. It does not call an AI API. It matches fixed approved questions and returns randomized answer variants.
+
+Example questions:
+
+```text
+What is Silkhaus?
+Can I extend my stay?
+How does self check-in work?
+Is Wi-Fi included?
+What amenities are included?
+How can I contact support?
+When is my booking confirmed?
 ```
 
 For live nearby places, the assistant asks the guest to choose grocery, medical/pharmacy or mall, then asks for their current WhatsApp location. If `GOOGLE_MAPS_API_KEY` is configured, the backend calls Google Places Nearby Search API and returns live place names, addresses, ratings and Maps links. Without the API key, it returns a Google Maps search link for demo continuity.

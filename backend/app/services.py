@@ -20,14 +20,15 @@ DEMO_DATA_PATH = Path(os.getenv("GUEST_ASSISTANT_DATA_PATH", str(DATA_DIR / "gue
 logger = logging.getLogger("guest_assistant.services")
 
 MENU_OPTIONS = {
-    "check_in": "Check-in instructions",
+    "check_in": "Check-in and access",
     "wifi": "Wi-Fi details",
-    "parking": "Parking information",
-    "facilities": "Property facilities",
+    "parking": "Parking",
+    "facilities": "Apartment amenities",
     "nearby_places": "Live nearby places",
     "checkout": "Checkout instructions",
-    "contact_host": "Contact host",
-    "report_issue": "Report maintenance issue",
+    "ai_support": "Silkhaus AI Support",
+    "contact_host": "Contact support",
+    "report_issue": "Report apartment issue",
     "directions": "Get directions",
 }
 
@@ -64,6 +65,7 @@ TEXT_ALIASES = {
     "facility": "facilities",
     "facilities": "facilities",
     "amenities": "facilities",
+    "amenity": "facilities",
     "5": "nearby_places",
     "nearby": "nearby_places",
     "nearby places": "nearby_places",
@@ -83,15 +85,26 @@ TEXT_ALIASES = {
     "check out": "checkout",
     "check-out": "checkout",
     "checkout": "checkout",
-    "7": "contact_host",
+    "7": "ai_support",
+    "ai": "ai_support",
+    "ai support": "ai_support",
+    "assistant": "ai_support",
+    "concierge": "ai_support",
+    "faq": "ai_support",
+    "question": "ai_support",
+    "ask question": "ai_support",
+    "8": "contact_host",
     "host": "contact_host",
+    "support": "contact_host",
     "contact": "contact_host",
     "contact host": "contact_host",
-    "8": "report_issue",
+    "contact support": "contact_host",
+    "9": "report_issue",
     "issue": "report_issue",
     "maintenance": "report_issue",
     "report issue": "report_issue",
-    "9": "directions",
+    "apartment issue": "report_issue",
+    "10": "directions",
     "direction": "directions",
     "directions": "directions",
     "location": "directions",
@@ -132,6 +145,16 @@ def load_demo_data(force_reload: bool = False) -> dict[str, Any]:
     with DEMO_DATA_PATH.open("r", encoding="utf-8") as handle:
         _DEMO_CACHE = json.load(handle)
     return _DEMO_CACHE
+
+
+def brand_values() -> dict[str, str]:
+    brand = load_demo_data().get("brand", {})
+    return {
+        "brand_name": brand.get("name", "Silkhaus"),
+        "concierge_name": brand.get("concierge_name", "Silkhaus AI Support"),
+        "support_phone": brand.get("support_phone", ""),
+        "support_email": brand.get("support_email", ""),
+    }
 
 
 def clear_runtime_state() -> None:
@@ -282,6 +305,7 @@ def guest_context(phone: str) -> dict[str, Any] | None:
     prop = property_for_booking(booking)
     context: dict[str, Any] = {
         "phone": normalize_phone(phone),
+        **brand_values(),
         "guest_name": booking.get("guest_name", "Guest"),
         "booking_id": booking.get("booking_id", ""),
         "check_in_date": booking.get("check_in_date", ""),
@@ -322,20 +346,21 @@ def menu_sections() -> list[dict[str, Any]]:
         {
             "title": "Stay Info",
             "rows": [
-                {"id": "check_in", "title": "Check-in instructions", "description": "Arrival and access details"},
+                {"id": "check_in", "title": "Check-in access", "description": "Arrival and entry details"},
                 {"id": "wifi", "title": "Wi-Fi details", "description": "Network and password"},
-                {"id": "parking", "title": "Parking information", "description": "Where to park"},
-                {"id": "facilities", "title": "Property facilities", "description": "Amenities included"},
-                {"id": "checkout", "title": "Checkout instructions", "description": "Departure checklist"},
+                {"id": "parking", "title": "Parking", "description": "Where to park"},
+                {"id": "facilities", "title": "Apartment amenities", "description": "What is included"},
+                {"id": "checkout", "title": "Checkout", "description": "Departure checklist"},
             ],
         },
         {
             "title": "Help",
             "rows": [
-                {"id": "nearby_places", "title": "Live nearby places", "description": "Grocery, medical or mall"},
-                {"id": "contact_host", "title": "Contact host", "description": "Host phone and email"},
-                {"id": "report_issue", "title": "Report maintenance issue", "description": "Send an issue to host"},
-                {"id": "directions", "title": "Get directions", "description": "Route to the property"},
+                {"id": "nearby_places", "title": "Nearby places", "description": "Grocery, medical or mall"},
+                {"id": "ai_support", "title": "AI Support", "description": "Ask fixed Silkhaus FAQs"},
+                {"id": "contact_host", "title": "Contact support", "description": "Support phone and email"},
+                {"id": "report_issue", "title": "Report issue", "description": "Send apartment issue"},
+                {"id": "directions", "title": "Directions", "description": "Route to the apartment"},
             ],
         },
     ]
@@ -349,7 +374,7 @@ def send_guest_menu(phone: str, values: dict[str, Any]) -> dict[str, Any]:
 def menu_payload(phone: str) -> dict[str, Any]:
     context = guest_context(phone)
     if not context:
-        values = {"phone": normalize_phone(phone)}
+        values = {"phone": normalize_phone(phone), **brand_values()}
         return {
             "phone": values["phone"],
             "known_guest": False,
@@ -392,6 +417,72 @@ def resolve_intent(text: str) -> str | None:
         if len(phrase) > 2 and phrase in cleaned:
             return intent
     return None
+
+
+def ai_support_examples() -> str:
+    questions = load_demo_data().get("ai_support_questions", [])
+    return "\n".join(f"- {item.get('question', '')}" for item in questions[:5])
+
+
+def match_ai_support_question(text: str) -> dict[str, Any] | None:
+    cleaned = " ".join(text.strip().lower().replace("?", " ").replace("_", " ").split())
+    if not cleaned:
+        return None
+
+    best_match: dict[str, Any] | None = None
+    best_score = 0
+    for item in load_demo_data().get("ai_support_questions", []):
+        score = 0
+        question = " ".join(str(item.get("question", "")).lower().replace("?", " ").split())
+        if question and question in cleaned:
+            score += 100
+        for keyword in item.get("keywords", []):
+            normalized_keyword = " ".join(str(keyword).lower().replace("?", " ").split())
+            if normalized_keyword and normalized_keyword in cleaned:
+                score += max(1, len(normalized_keyword))
+        if score > best_score:
+            best_score = score
+            best_match = item
+    return best_match if best_score >= 4 else None
+
+
+def start_ai_support_flow(phone: str, values: dict[str, Any]) -> dict[str, Any]:
+    remember_session(phone, pending_action="ai_support")
+    values = dict(values)
+    values["ai_question_examples"] = ai_support_examples()
+    reply = pick_reply("ai_support_prompt", values)
+    delivery = send_whatsapp_text(phone, reply)
+    return {"action": "ai_support_prompt", "reply": reply, "delivery": delivery}
+
+
+def answer_ai_support_question(phone: str, text: str) -> dict[str, Any]:
+    context = guest_context(phone)
+    if not context:
+        reply = pick_reply("unknown_guest", {"phone": normalize_phone(phone), **brand_values()})
+        delivery = send_whatsapp_text(phone, reply)
+        return {"action": "unknown_guest", "reply": reply, "delivery": delivery}
+
+    values = dict(context["values"])
+    values["ai_question_examples"] = ai_support_examples()
+    match = match_ai_support_question(text)
+    if not match:
+        remember_session(phone, pending_action="ai_support")
+        reply = pick_reply("ai_support_unknown", values)
+        delivery = send_whatsapp_text(phone, reply)
+        return {"action": "ai_support_unknown", "reply": reply, "delivery": delivery}
+
+    answer_template = random.choice(match.get("answers") or ["I can help with that from your Silkhaus booking details."])
+    values["ai_question"] = match.get("question", text)
+    values["ai_answer"] = answer_template.format_map(SafeFormatDict(values)).strip()
+    remember_session(phone, pending_action="ai_support", last_ai_question=match.get("id"))
+    reply = pick_reply("ai_support_answer", values)
+    delivery = send_whatsapp_text(phone, reply)
+    return {
+        "action": "ai_support_answer",
+        "question_id": match.get("id"),
+        "reply": reply,
+        "delivery": delivery,
+    }
 
 
 def start_directions_flow(phone: str, values: dict[str, Any]) -> dict[str, Any]:
@@ -480,7 +571,7 @@ def directions_response(
 ) -> dict[str, Any]:
     context = guest_context(phone)
     if not context:
-        reply = pick_reply("unknown_guest", {"phone": normalize_phone(phone)})
+        reply = pick_reply("unknown_guest", {"phone": normalize_phone(phone), **brand_values()})
         return {"action": "unknown_guest", "reply": reply}
     values = dict(context["values"])
     dest_lat = float(values["property_latitude"])
@@ -525,7 +616,7 @@ def normalize_nearby_category(value: str | None) -> str | None:
 def choose_nearby_category(phone: str, category: str) -> dict[str, Any]:
     context = guest_context(phone)
     if not context:
-        reply = pick_reply("unknown_guest", {"phone": normalize_phone(phone)})
+        reply = pick_reply("unknown_guest", {"phone": normalize_phone(phone), **brand_values()})
         return {"action": "unknown_guest", "reply": reply}
     normalized_category = normalize_nearby_category(category)
     values = dict(context["values"])
@@ -672,7 +763,7 @@ def nearby_places_response(
 ) -> dict[str, Any]:
     context = guest_context(phone)
     if not context:
-        reply = pick_reply("unknown_guest", {"phone": normalize_phone(phone)})
+        reply = pick_reply("unknown_guest", {"phone": normalize_phone(phone), **brand_values()})
         return {"action": "unknown_guest", "reply": reply}
     normalized_category = normalize_nearby_category(category)
     if not normalized_category:
@@ -705,7 +796,7 @@ def nearby_places_response(
 def answer_intent(phone: str, intent: str) -> dict[str, Any]:
     context = guest_context(phone)
     if not context:
-        reply = pick_reply("unknown_guest", {"phone": normalize_phone(phone)})
+        reply = pick_reply("unknown_guest", {"phone": normalize_phone(phone), **brand_values()})
         delivery = send_whatsapp_text(phone, reply)
         return {"action": "unknown_guest", "reply": reply, "delivery": delivery}
 
@@ -714,6 +805,8 @@ def answer_intent(phone: str, intent: str) -> dict[str, Any]:
         return start_directions_flow(phone, values)
     if intent == "nearby_places":
         return start_nearby_flow(phone, values)
+    if intent == "ai_support":
+        return start_ai_support_flow(phone, values)
     if intent.startswith("nearby_category:"):
         return choose_nearby_category(phone, intent.split(":", 1)[1])
     if intent == "menu":
@@ -747,7 +840,7 @@ def answer_intent(phone: str, intent: str) -> dict[str, Any]:
 def handle_issue_description(phone: str, text: str) -> dict[str, Any]:
     context = guest_context(phone)
     if not context:
-        reply = pick_reply("unknown_guest", {"phone": normalize_phone(phone)})
+        reply = pick_reply("unknown_guest", {"phone": normalize_phone(phone), **brand_values()})
         return {"action": "unknown_guest", "reply": reply}
     values = dict(context["values"])
     values["issue_summary"] = text.strip()
@@ -818,18 +911,26 @@ def process_incoming_whatsapp_message(
     session = get_session(normalized)
     if session.get("pending_action") == "report_issue":
         return handle_issue_description(normalized, text)
+    if session.get("pending_action") == "ai_support":
+        if match_ai_support_question(text):
+            return answer_ai_support_question(normalized, text)
+        intent = resolve_intent(text)
+        if intent and intent != "ai_support":
+            remember_session(normalized, pending_action=None)
+            return answer_intent(normalized, intent)
+        return answer_ai_support_question(normalized, text)
     if session.get("pending_action") == "live_nearby_category":
         category = normalize_nearby_category(text)
         if category:
             return choose_nearby_category(normalized, category)
         context = guest_context(normalized)
-        values = context["values"] if context else {"phone": normalized}
+        values = context["values"] if context else {"phone": normalized, **brand_values()}
         reply = pick_reply("nearby_category_invalid", values)
         send_whatsapp_text(normalized, reply)
         return {"action": "nearby_category_invalid", "reply": reply}
     if session.get("pending_action") == "live_nearby_location" and text.lower() not in {"menu", "hi", "hello"}:
         context = guest_context(normalized)
-        values = context["values"] if context else {"phone": normalized}
+        values = context["values"] if context else {"phone": normalized, **brand_values()}
         category = session.get("nearby_category") or "grocery"
         values["nearby_category"] = NEARBY_CATEGORIES[category]["label"]
         reply = pick_reply("nearby_need_location", values)
@@ -837,7 +938,7 @@ def process_incoming_whatsapp_message(
         return {"action": "nearby_need_location", "reply": reply}
     if session.get("pending_action") == "directions" and text.lower() not in {"menu", "hi", "hello"}:
         context = guest_context(normalized)
-        values = context["values"] if context else {"phone": normalized}
+        values = context["values"] if context else {"phone": normalized, **brand_values()}
         reply = pick_reply("directions_need_location", values)
         send_whatsapp_text(normalized, reply)
         return {"action": "directions_need_location", "reply": reply}
@@ -847,7 +948,9 @@ def process_incoming_whatsapp_message(
         return answer_intent(normalized, intent)
 
     context = guest_context(normalized)
-    values = context["values"] if context else {"phone": normalized}
+    values = context["values"] if context else {"phone": normalized, **brand_values()}
+    if context and match_ai_support_question(text):
+        return answer_ai_support_question(normalized, text)
     reply = pick_reply("fallback", values) if context else pick_reply("unknown_guest", values)
     delivery = send_whatsapp_text(normalized, reply)
     return {"action": "fallback" if context else "unknown_guest", "reply": reply, "delivery": delivery}
