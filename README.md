@@ -190,6 +190,15 @@ WHATSAPP_GRAPH_API_VERSION=v20.0
 GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 ```
 
+For mock outbound mode, keep:
+
+```text
+FORCE_MOCK_WHATSAPP=true
+WHATSAPP_PROVIDER=mock
+```
+
+In mock outbound mode, webhooks are still processed, but replies are not sent through Meta Cloud API. This avoids Meta token errors during backend demos.
+
 Webhook callback URL:
 
 ```text

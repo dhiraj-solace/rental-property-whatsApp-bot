@@ -117,6 +117,8 @@ def normalize_phone(phone: str | None) -> str:
 
 
 def whatsapp_provider() -> str:
+    if os.getenv("FORCE_MOCK_WHATSAPP", "").strip().lower() in {"1", "true", "yes", "on"}:
+        return "mock"
     return os.getenv("WHATSAPP_PROVIDER", "mock").strip().lower() or "mock"
 
 
