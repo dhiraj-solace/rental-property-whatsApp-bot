@@ -7,6 +7,7 @@ import random
 import urllib.error
 import urllib.parse
 import urllib.request
+from contextvars import ContextVar
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -100,6 +101,10 @@ TEXT_ALIASES = {
 
 _SESSIONS: dict[str, dict[str, Any]] = {}
 _DEMO_CACHE: dict[str, Any] | None = None
+_CURRENT_WHATSAPP_PHONE_NUMBER_ID: ContextVar[str | None] = ContextVar(
+    "current_whatsapp_phone_number_id",
+    default=None,
+)
 
 
 class SafeFormatDict(dict):
@@ -137,7 +142,10 @@ def send_whatsapp_text(to_phone: str, body: str) -> dict[str, Any]:
     to_phone = normalize_phone(to_phone)
     provider = whatsapp_provider()
     logger.info("whatsapp_send_start provider=%s to=%s body_chars=%s", provider, to_phone, len(body))
-    phone_number_id = os.getenv("WHATSAPP_PHONE_NUMBER_ID", "").strip()
+    phone_number_id = (
+        _CURRENT_WHATSAPP_PHONE_NUMBER_ID.get()
+        or os.getenv("WHATSAPP_PHONE_NUMBER_ID", "").strip()
+    )
     access_token = os.getenv("WHATSAPP_ACCESS_TOKEN", "").strip()
     graph_version = os.getenv("WHATSAPP_GRAPH_API_VERSION", "v20.0").strip() or "v20.0"
     if not phone_number_id or not access_token:
@@ -746,6 +754,9 @@ def process_whatsapp_webhook_payload(payload: dict[str, Any]) -> list[dict[str, 
     for entry in payload.get("entry") or []:
         for change in entry.get("changes") or []:
             value = change.get("value") or {}
+            metadata = value.get("metadata") or {}
+            receiving_phone_number_id = str(metadata.get("phone_number_id") or "").strip() or None
+            display_phone_number = str(metadata.get("display_phone_number") or "").strip() or None
             for status in value.get("statuses") or []:
                 logger.info("webhook_status provider_message_id=%s status=%s", status.get("id"), status.get("status"))
                 results.append({"action": "message_status", "status": status.get("status"), "provider_message_id": status.get("id")})
@@ -754,7 +765,14 @@ def process_whatsapp_webhook_payload(payload: dict[str, Any]) -> list[dict[str, 
                 if not phone:
                     continue
                 message = _normalize_webhook_message(raw_message)
-                results.append(process_incoming_whatsapp_message(phone, message, raw_message.get("id")))
+                token = _CURRENT_WHATSAPP_PHONE_NUMBER_ID.set(receiving_phone_number_id)
+                try:
+                    result = process_incoming_whatsapp_message(phone, message, raw_message.get("id"))
+                finally:
+                    _CURRENT_WHATSAPP_PHONE_NUMBER_ID.reset(token)
+                result["receiving_phone_number_id"] = receiving_phone_number_id
+                result["display_phone_number"] = display_phone_number
+                results.append(result)
     return results
 
 

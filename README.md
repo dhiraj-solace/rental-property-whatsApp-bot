@@ -192,6 +192,8 @@ GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 
 For real WhatsApp replies, `WHATSAPP_ACCESS_TOKEN` must be a valid Meta Cloud API token and `WHATSAPP_PHONE_NUMBER_ID` must be the Phone Number ID for the WhatsApp sender. If Meta returns `401` with OAuth code `190`, refresh the token and redeploy.
 
+When Meta includes `metadata.phone_number_id` in a webhook event, the backend uses that incoming phone number ID for the reply. This keeps replies on the same WhatsApp Business number that received the guest message. If replies come from a `+1 555...` number, check that the webhook is attached to the intended business number and that `WHATSAPP_PHONE_NUMBER_ID` is not set to Meta's test number.
+
 Webhook callback URL:
 
 ```text

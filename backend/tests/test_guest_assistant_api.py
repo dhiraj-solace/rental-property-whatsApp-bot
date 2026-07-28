@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import unittest
+from unittest.mock import patch
 
 from app.main import (
     directions_preview,
@@ -15,7 +16,7 @@ from app.schemas import DirectionPreviewIn, MessagePreviewIn, NearbyPreviewIn, S
 from app.services import clear_runtime_state, process_whatsapp_webhook_payload
 
 
-KNOWN_PHONE = "919999000001"
+KNOWN_PHONE = "918459294241"
 UNKNOWN_PHONE = "919999009999"
 
 
@@ -204,6 +205,49 @@ class GuestAssistantApiTests(unittest.TestCase):
 
         self.assertEqual(results[0]["action"], "check_in")
         self.assertIn("4521", results[0]["reply"])
+
+    def test_webhook_reply_uses_receiving_phone_number_id(self) -> None:
+        payload = {
+            "entry": [
+                {
+                    "changes": [
+                        {
+                            "value": {
+                                "metadata": {
+                                    "display_phone_number": "918000000000",
+                                    "phone_number_id": "real_business_phone_id",
+                                },
+                                "messages": [
+                                    {
+                                        "id": "wamid.demo.same.sender",
+                                        "from": KNOWN_PHONE,
+                                        "type": "text",
+                                        "text": {"body": "wifi"},
+                                    }
+                                ],
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+
+        with patch.dict(
+            os.environ,
+            {
+                "WHATSAPP_PHONE_NUMBER_ID": "wrong_env_phone_id",
+                "WHATSAPP_ACCESS_TOKEN": "demo-token",
+            },
+            clear=False,
+        ):
+            with patch("app.services.urllib.request.urlopen") as urlopen:
+                urlopen.return_value.__enter__.return_value.read.return_value = b'{"messages":[{"id":"wamid.out"}]}'
+                results = process_whatsapp_webhook_payload(payload)
+
+        request = urlopen.call_args.args[0]
+        self.assertIn("/real_business_phone_id/messages", request.full_url)
+        self.assertEqual(results[0]["display_phone_number"], "918000000000")
+        self.assertEqual(results[0]["receiving_phone_number_id"], "real_business_phone_id")
 
     def test_guest_profile_exposes_demo_context_for_showcase(self) -> None:
         response = guest_profile(KNOWN_PHONE)
