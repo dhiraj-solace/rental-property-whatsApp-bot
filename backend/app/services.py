@@ -148,6 +148,11 @@ def send_whatsapp_text(to_phone: str, body: str) -> dict[str, Any]:
     )
     access_token = os.getenv("WHATSAPP_ACCESS_TOKEN", "").strip()
     graph_version = os.getenv("WHATSAPP_GRAPH_API_VERSION", "v20.0").strip() or "v20.0"
+    logger.info(
+        "whatsapp_send_sender phone_number_id=%s source=%s",
+        phone_number_id or "missing",
+        "webhook_metadata" if _CURRENT_WHATSAPP_PHONE_NUMBER_ID.get() else "env",
+    )
     if not phone_number_id or not access_token:
         logger.warning("whatsapp_send_meta_not_configured to=%s", to_phone)
         return {"delivery_status": "meta_not_configured", "provider_message_id": None, "body": body}
