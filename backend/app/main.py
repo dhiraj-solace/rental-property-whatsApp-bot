@@ -48,6 +48,17 @@ app.add_middleware(
 )
 
 
+@app.get("/")
+def root() -> dict:
+    return {
+        "name": "WhatsApp Guest Assistant POC",
+        "status": "ok",
+        "health": "/health",
+        "docs": "/docs",
+        "mock_menu": "/api/mock-whatsapp/menu?phone=919999000001",
+    }
+
+
 @app.get("/health")
 def health() -> dict:
     data = load_demo_data()
