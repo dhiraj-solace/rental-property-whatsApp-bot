@@ -96,11 +96,11 @@
   "bookings": [
     {
       "booking_id": "BK-CASA-1001",
-      "guest_name": "Rahul",
-      "guest_phone": "919999000001",
+      "guest_name": "Dhiraj Rajput",
+      "guest_phone": "918459294241",
       "property_id": "goa_villa_001",
-      "check_in_date": "2026-08-01",
-      "check_out_date": "2026-08-04",
+      "check_in_date": "2026-07-28",
+      "check_out_date": "2026-07-30",
       "status": "confirmed"
     },
     {
