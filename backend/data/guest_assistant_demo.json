@@ -1,296 +1,351 @@
 {
-  "schema_version": "1.0",
-  "platform": {
-    "name": "Guest WhatsApp Assistant",
-    "supported_use_cases": [
-      "Vacation rentals",
-      "Hotels",
-      "Serviced apartments",
-      "Hostels",
-      "Property management companies"
-    ],
-    "default_language": "en",
-    "timezone": "UTC"
+  "brand": {
+    "name": "XYZ Stays",
+    "concierge_name": "XYZ Stays Guest Assistant",
+    "support_phone": "+1 555 010 2026",
+    "support_email": "support@xyzstays.example",
+    "office_address": "100 Demo Avenue, Central Business District, Demo City"
   },
-  "companies": [
-    {
-      "company_id": "company_001",
-      "brand": {
-        "name": "{{COMPANY_NAME}}",
-        "concierge_name": "{{COMPANY_NAME}} Guest Assistant",
-        "support_phone": "{{SUPPORT_PHONE}}",
-        "support_email": "{{SUPPORT_EMAIL}}",
-        "office_address": "{{OFFICE_ADDRESS}}",
-        "website": "{{WEBSITE_URL}}",
-        "logo_url": "{{LOGO_URL}}"
-      },
-      "settings": {
-        "whatsapp_number": "{{WHATSAPP_BUSINESS_NUMBER}}",
-        "enable_ai_support": true,
-        "enable_live_directions": true,
-        "enable_nearby_places": true,
-        "enable_issue_reporting": true,
-        "show_private_details_only_for_confirmed_bookings": true
-      }
-    }
-  ],
   "properties": [
     {
-      "property_id": "property_001",
-      "company_id": "company_001",
-      "name": "{{PROPERTY_NAME}}",
-      "property_type": "{{APARTMENT_OR_HOTEL_OR_VILLA}}",
-      "address": "{{PROPERTY_ADDRESS}}",
+      "id": "xyz_stays_pune_001",
+      "name": "XYZ Stays Pune Premium Apartment",
+      "address": "Baner, Pune, Maharashtra, India",
       "location": {
-        "latitude": "{{LATITUDE}}",
-        "longitude": "{{LONGITUDE}}"
+        "latitude": 18.559,
+        "longitude": 73.7868
       },
       "check_in": {
-        "time": "{{CHECK_IN_TIME}}",
+        "time": "3:00 PM",
         "steps": [
-          "{{CHECK_IN_STEP_1}}",
-          "{{CHECK_IN_STEP_2}}",
-          "{{CHECK_IN_STEP_3}}"
-        ],
-        "access_code": "{{SECURE_RUNTIME_VALUE}}"
+          "Arrive at the building reception and mention your XYZ Stays booking reference.",
+          "Follow the self check-in instructions shared with your confirmed booking.",
+          "Enter smart lock code 7314 followed by #.",
+          "Keep a valid government-issued ID ready if building security requests verification."
+        ]
       },
       "checkout": {
-        "time": "{{CHECKOUT_TIME}}",
+        "time": "11:00 AM",
         "steps": [
-          "{{CHECKOUT_STEP_1}}",
-          "{{CHECKOUT_STEP_2}}",
-          "{{CHECKOUT_STEP_3}}"
+          "Switch off the AC, lights and kitchen appliances before leaving.",
+          "Leave used towels in the bathroom and place access cards on the dining table.",
+          "Lock the apartment door and confirm checkout on WhatsApp.",
+          "Message XYZ Stays support if you need luggage guidance or a late-checkout request."
         ]
       },
       "wifi": {
-        "network": "{{WIFI_NETWORK}}",
-        "password": "{{SECURE_RUNTIME_VALUE}}"
+        "network": "XYZ_Stays_Pune_Guest",
+        "password": "XYZStay7314"
       },
       "parking": {
-        "available": true,
-        "summary": "{{PARKING_INSTRUCTIONS}}"
+        "summary": "One reserved parking space is included. Share your vehicle number with XYZ Stays support before arrival for smooth building access."
       },
       "facilities": [
-        "{{FACILITY_1}}",
-        "{{FACILITY_2}}",
-        "{{FACILITY_3}}"
-      ],
-      "house_rules": [
-        "{{HOUSE_RULE_1}}",
-        "{{HOUSE_RULE_2}}"
+        "High-speed Wi-Fi",
+        "Self check-in with smart lock access",
+        "Fully equipped kitchen",
+        "Fresh linens and bathroom essentials",
+        "Professional cleaning before arrival",
+        "Dedicated workspace",
+        "Washing machine",
+        "Building gym and common-area access, subject to building policy"
       ],
       "host": {
-        "name": "{{HOST_OR_SUPPORT_TEAM_NAME}}",
-        "phone": "{{HOST_PHONE}}",
-        "email": "{{HOST_EMAIL}}"
+        "name": "XYZ Stays Guest Support",
+        "phone": "+1 555 010 2026",
+        "email": "support@xyzstays.example"
+      }
+    },
+    {
+      "id": "xyz_stays_mumbai_002",
+      "name": "XYZ Stays Mumbai Serviced Apartment",
+      "address": "Bandra Kurla Complex, Mumbai, Maharashtra, India",
+      "location": {
+        "latitude": 19.0678,
+        "longitude": 72.8691
+      },
+      "check_in": {
+        "time": "3:00 PM",
+        "steps": [
+          "Reach the building lobby and show your confirmed XYZ Stays booking if requested.",
+          "Follow the access guidance included in your self check-in message.",
+          "Enter smart lock code 9265 followed by #.",
+          "Contact XYZ Stays support on WhatsApp if building security needs confirmation."
+        ]
+      },
+      "checkout": {
+        "time": "11:00 AM",
+        "steps": [
+          "Remove personal food from the refrigerator.",
+          "Place access cards and keys on the dining table.",
+          "Close balcony doors and switch off major appliances.",
+          "Send a checkout confirmation to XYZ Stays support after leaving."
+        ]
+      },
+      "wifi": {
+        "network": "XYZ_Stays_Mumbai_Guest",
+        "password": "XYZStay9265"
+      },
+      "parking": {
+        "summary": "Visitor or allocated parking is available according to building policy. Share your vehicle details with XYZ Stays support for guidance."
+      },
+      "facilities": [
+        "High-speed Wi-Fi",
+        "Equipped kitchen",
+        "Fresh linens and towels",
+        "Bathroom essentials",
+        "Washing and ironing essentials",
+        "Professional cleaning",
+        "24/7 guest support"
+      ],
+      "host": {
+        "name": "XYZ Stays Guest Support",
+        "phone": "+1 555 010 2026",
+        "email": "support@xyzstays.example"
       }
     }
   ],
   "bookings": [
     {
-      "booking_id": "{{BOOKING_ID}}",
-      "company_id": "company_001",
-      "guest_name": "{{GUEST_NAME}}",
-      "guest_phone": "{{GUEST_WHATSAPP_NUMBER}}",
-      "property_id": "property_001",
-      "check_in_date": "{{YYYY-MM-DD}}",
-      "check_out_date": "{{YYYY-MM-DD}}",
-      "status": "confirmed",
-      "source": "{{AIRBNB_OR_BOOKING_COM_OR_DIRECT}}"
-    }
-  ],
-  "menu_options": [
-    {
-      "id": "check_in",
-      "label": "Check-in Instructions"
+      "booking_id": "XYZ-PUN-1001",
+      "guest_name": "Demo Guest",
+      "guest_phone": "918459294241",
+      "property_id": "xyz_stays_pune_001",
+      "check_in_date": "2026-08-01",
+      "check_out_date": "2026-08-04",
+      "status": "confirmed"
     },
     {
-      "id": "wifi",
-      "label": "Wi-Fi Details"
-    },
-    {
-      "id": "parking",
-      "label": "Parking Information"
-    },
-    {
-      "id": "facilities",
-      "label": "Property Facilities"
-    },
-    {
-      "id": "nearby",
-      "label": "Nearby Places"
-    },
-    {
-      "id": "checkout",
-      "label": "Checkout Instructions"
-    },
-    {
-      "id": "contact_host",
-      "label": "Contact Host"
-    },
-    {
-      "id": "report_issue",
-      "label": "Report an Issue"
-    },
-    {
-      "id": "directions",
-      "label": "Get Directions"
-    },
-    {
-      "id": "ai_support",
-      "label": "Ask Guest Assistant"
+      "booking_id": "XYZ-MUM-2002",
+      "guest_name": "Sample Guest",
+      "guest_phone": "919000000002",
+      "property_id": "xyz_stays_mumbai_002",
+      "check_in_date": "2026-09-12",
+      "check_out_date": "2026-09-15",
+      "status": "confirmed"
     }
   ],
   "ai_support_questions": [
     {
-      "id": "about_company",
-      "question": "Tell me about the company.",
+      "id": "about_xyz_stays",
+      "question": "What is XYZ Stays?",
       "keywords": [
-        "about company",
-        "who are you",
-        "company information"
+        "what is xyz stays",
+        "about xyz stays",
+        "who is xyz stays",
+        "xyz stays company"
       ],
       "answers": [
-        "{{COMPANY_NAME}} provides managed accommodation and guest support services.",
-        "You are speaking with the guest assistant for {{COMPANY_NAME}}."
+        "XYZ Stays is a fictional demo hospitality brand offering furnished apartments for flexible short and extended stays. It combines home-style comfort, self check-in and digital guest support.",
+        "XYZ Stays is a reusable demo brand for presenting a furnished-apartment guest assistant to hospitality leads without using any real client identity."
       ]
     },
     {
-      "id": "extend_stay",
+      "id": "flexible_stays",
       "question": "Can I extend my stay?",
       "keywords": [
         "extend",
-        "stay longer",
         "extension",
-        "late checkout"
+        "stay longer",
+        "long term",
+        "monthly stay",
+        "flexible stay"
       ],
       "answers": [
-        "An extension may be possible depending on availability. Please share your preferred new checkout date.",
-        "I can connect you with {{COMPANY_NAME}} support to check availability and pricing."
+        "Extensions are usually possible when the apartment is available. Share your preferred checkout date with XYZ Stays support and the team can confirm availability and pricing.",
+        "XYZ Stays supports flexible stays from short visits to longer monthly stays. I can connect you with support to check whether {property_name} is available for your new dates."
       ]
     },
     {
       "id": "self_check_in",
-      "question": "How does check-in work?",
+      "question": "How does self check-in work?",
       "keywords": [
-        "check in",
-        "self check-in",
+        "self check in",
+        "self-check-in",
+        "smart lock",
         "access code",
-        "door code"
+        "door code",
+        "check in process"
       ],
       "answers": [
-        "Check-in for {{PROPERTY_NAME}} starts at {{CHECK_IN_TIME}}. Follow the instructions available in the Check-in menu.",
-        "Keep a valid ID and your booking reference ready if verification is required."
+        "For {property_name}, check-in is from {check_in_time}. Use the building instructions and smart lock code from your confirmed booking details. Your current access code is included in the check-in menu.",
+        "Self check-in means you can arrive without waiting at a front desk. Follow the apartment access steps, keep ID ready for building security, and contact XYZ Stays support if access needs help."
       ]
     },
     {
       "id": "wifi_included",
       "question": "Is Wi-Fi included?",
       "keywords": [
-        "wifi",
-        "internet",
-        "wi-fi included"
+        "wifi included",
+        "wi-fi included",
+        "internet included",
+        "high speed wifi",
+        "internet"
       ],
       "answers": [
-        "Yes, Wi-Fi is available at {{PROPERTY_NAME}}. Open the Wi-Fi menu to view the network details.",
-        "The Wi-Fi network and password are available only to guests with confirmed bookings."
+        "Yes. High speed Wi-Fi is included at {property_name}. Your network is {wifi_network} and the password is {wifi_password}.",
+        "Wi-Fi is ready in the apartment. Connect to {wifi_network} using password {wifi_password}."
       ]
     },
     {
-      "id": "amenities",
-      "question": "What facilities are available?",
+      "id": "amenities_included",
+      "question": "What amenities are included?",
       "keywords": [
-        "amenities",
-        "facilities",
-        "what is included"
+        "amenities included",
+        "facilities included",
+        "what is included",
+        "kitchen",
+        "linens",
+        "cleaning",
+        "workspace"
       ],
       "answers": [
-        "The available facilities are:\n{{FACILITIES}}",
-        "Open the Property Facilities option to view the amenities included with your stay."
+        "{property_name} includes furnished living essentials such as high speed Wi-Fi, equipped kitchen, fresh linens, bathroom essentials and professional cleaning before arrival.",
+        "Your XYZ Stays apartment is move-in ready. Included amenities are:\n{facilities}"
       ]
     },
     {
-      "id": "support",
+      "id": "support_hours",
       "question": "How can I contact support?",
       "keywords": [
-        "support",
-        "contact",
-        "help",
-        "host"
+        "contact support",
+        "support hours",
+        "24/7",
+        "concierge",
+        "help team",
+        "call xyz stays"
       ],
       "answers": [
-        "Contact {{COMPANY_NAME}} support at {{SUPPORT_PHONE}} or {{SUPPORT_EMAIL}}.",
-        "Use the Contact Host option for direct assistance."
+        "You can contact {brand_name} support at {support_phone} or {support_email}. WhatsApp is the primary concierge channel for quick stay help.",
+        "{brand_name} support is available through the concierge flow. Phone: {support_phone}. Email: {support_email}."
+      ]
+    },
+    {
+      "id": "payment_policy",
+      "question": "When is my booking confirmed?",
+      "keywords": [
+        "booking confirmed",
+        "payment",
+        "paid",
+        "confirm reservation",
+        "reservation confirmed"
+      ],
+      "answers": [
+        "This assistant only serves guests with confirmed bookings. In XYZ Stays booking flow, booking confirmation happens after payment is processed and confirmation details are issued.",
+        "Your booking {booking_id} is already confirmed. That is why I can show private stay details like access, Wi-Fi and checkout instructions."
       ]
     }
   ],
   "response_templates": {
     "welcome": [
-      "Hi {{GUEST_NAME}}, welcome to {{COMPANY_NAME}}. Your confirmed stay at {{PROPERTY_NAME}} is from {{CHECK_IN_DATE}} to {{CHECK_OUT_DATE}}. How can I help?",
-      "Hello {{GUEST_NAME}}. I found your booking for {{PROPERTY_NAME}}. Please choose an option from the menu."
+      "Hi {guest_name}, welcome to {brand_name}. Your confirmed stay at {property_name} is from {check_in_date} to {check_out_date}. How can I help?",
+      "Hello {guest_name}. I found your {brand_name} booking for {property_name}. Pick any option below and I will help right away.",
+      "Welcome to {brand_name}, {guest_name}. I have your {property_name} stay details ready. What would you like to check?"
     ],
     "unknown_guest": [
-      "I could not find a confirmed booking linked to this WhatsApp number. Please contact {{SUPPORT_EMAIL}}.",
-      "This number is not linked to an active booking. Please message us from the registered guest number."
+      "I could not find a confirmed {brand_name} booking for this WhatsApp number. Please contact {support_email} or message from the registered guest number.",
+      "This number is not linked with an active confirmed {brand_name} stay in the demo data. Please contact support for help.",
+      "I am unable to match this WhatsApp number with a confirmed {brand_name} booking. Support can verify and assist manually."
     ],
     "check_in": [
-      "Check-in starts at {{CHECK_IN_TIME}} on {{CHECK_IN_DATE}}.\n\n{{CHECK_IN_STEPS}}",
-      "Here are the check-in instructions for {{PROPERTY_NAME}}:\n\n{{CHECK_IN_STEPS}}"
+      "Your {brand_name} check-in is from {check_in_time} on {check_in_date}.\n\n{check_in_steps}",
+      "Here are the self check-in steps for {property_name}:\n\n{check_in_steps}\n\nCheck-in time: {check_in_time}.",
+      "You are all set for check-in at {property_name}. Please follow these access steps:\n\n{check_in_steps}"
     ],
     "wifi": [
-      "Wi-Fi details:\nNetwork: {{WIFI_NETWORK}}\nPassword: {{WIFI_PASSWORD}}",
-      "Connect to {{WIFI_NETWORK}} using the password {{WIFI_PASSWORD}}."
+      "Sure. {brand_name} Wi-Fi details:\nNetwork: {wifi_network}\nPassword: {wifi_password}",
+      "You can connect to the apartment Wi-Fi using:\nNetwork: {wifi_network}\nPassword: {wifi_password}",
+      "High speed Wi-Fi is available at {property_name}.\nNetwork: {wifi_network}\nPassword: {wifi_password}"
     ],
     "parking": [
-      "Parking information for {{PROPERTY_NAME}}: {{PARKING_SUMMARY}}"
+      "Parking information for {property_name}: {parking_summary}",
+      "Yes, parking guidance is covered for your stay. {parking_summary}",
+      "Here is the parking note from {brand_name}: {parking_summary}"
     ],
     "facilities": [
-      "Facilities available during your stay:\n{{FACILITIES}}"
+      "Amenities available during your {brand_name} stay:\n{facilities}",
+      "{property_name} includes these guest amenities:\n{facilities}",
+      "Here is what is included in your move-in ready apartment:\n{facilities}"
+    ],
+    "ai_support_prompt": [
+      "{concierge_name} is ready. Ask me anything about your XYZ Stays stay. For example:\n{ai_question_examples}",
+      "Ask me a XYZ Stays support question. I can help with booking, access, amenities and support.\n{ai_question_examples}",
+      "Sure. Tell me what you need help with. You can ask things like:\n{ai_question_examples}"
+    ],
+    "ai_support_answer": [
+      "{ai_answer}\n\nYou can ask another question, or type menu.",
+      "Here is the answer from {concierge_name}:\n{ai_answer}\n\nAsk another question or type menu.",
+      "{ai_answer}\n\nI can keep helping with your XYZ Stays stay, or you can type menu."
+    ],
+    "ai_support_unknown": [
+      "I could not answer that from your stay details yet. Try one of these:\n{ai_question_examples}",
+      "I want to make sure I answer accurately. Please ask one of these stay questions:\n{ai_question_examples}",
+      "I can help best with booking, access, amenities and support questions like:\n{ai_question_examples}"
     ],
     "nearby_category_prompt": [
-      "What would you like to find nearby?\n1. Grocery\n2. Medical / Pharmacy\n3. Restaurants\n4. Shopping\n5. Transport"
+      "Sure. What nearby place should I find around your current location?\n1. Grocery\n2. Medical / Pharmacy\n3. Mall / Shopping",
+      "I can search live places around you. Please choose grocery, medical or mall.",
+      "Tell me the nearby category you need: grocery, medical/pharmacy or mall."
+    ],
+    "nearby_category_invalid": [
+      "Please choose one nearby category: grocery, medical or mall.",
+      "I can search grocery, medical/pharmacy or mall. Which one do you need?",
+      "Please reply with grocery, medical or mall so I can continue."
     ],
     "nearby_location_prompt": [
-      "Please share your current WhatsApp location so I can find nearby {{NEARBY_CATEGORY}} options."
+      "Great, please share your current WhatsApp location and I will find nearby {nearby_category} options.",
+      "Send your current location pin now. I will search live {nearby_category} places around you.",
+      "Please share your WhatsApp location so I can find nearby {nearby_category} places."
+    ],
+    "nearby_need_location": [
+      "I need your shared WhatsApp location to search live nearby {nearby_category} places.",
+      "Please send a location pin, not text, so I can search nearby {nearby_category} options.",
+      "Share your current location and I will find nearby {nearby_category} places."
     ],
     "nearby_live_result": [
-      "Nearby {{NEARBY_CATEGORY}} options:\n\n{{NEARBY_RESULTS}}"
+      "Nearby {nearby_category} options around your current location:\n\n{nearby_results}",
+      "I found these live {nearby_category} results near you:\n\n{nearby_results}",
+      "Here are nearby {nearby_category} places from your shared location:\n\n{nearby_results}"
     ],
     "checkout": [
-      "Checkout is by {{CHECKOUT_TIME}} on {{CHECK_OUT_DATE}}.\n\n{{CHECKOUT_STEPS}}"
+      "Checkout is by {checkout_time} on {check_out_date}.\n\n{checkout_steps}",
+      "Before you leave {property_name}, please follow these checkout steps:\n\n{checkout_steps}",
+      "Your checkout time is {checkout_time}. Quick checklist:\n\n{checkout_steps}"
     ],
     "contact_host": [
-      "{{COMPANY_NAME}} support:\nPhone: {{SUPPORT_PHONE}}\nEmail: {{SUPPORT_EMAIL}}"
+      "{brand_name} support:\nPhone: {support_phone}\nEmail: {support_email}",
+      "For direct help with your stay, contact {brand_name} support at {support_phone}. Email: {support_email}",
+      "Your concierge contact for this stay is {host_name}.\nPhone: {host_phone}\nEmail: {host_email}"
     ],
     "report_issue_prompt": [
-      "Please describe the issue and mention the room or area where it occurred."
+      "Please describe the apartment issue in one message. I will format it for {brand_name} support.",
+      "Tell me what is not working or needs attention, and include the room or area if possible.",
+      "Share the apartment issue details now. Example: AC in bedroom is not cooling."
     ],
     "report_issue_confirm": [
-      "Thank you. Your issue has been recorded: {{ISSUE_SUMMARY}}."
+      "Thanks, I have noted this for {brand_name} support: {issue_summary}. This is where the support alert would be triggered.",
+      "Got it. Maintenance note prepared for {host_name}: {issue_summary}. In production this would create a ticket or team notification.",
+      "I understand the issue: {issue_summary}. I would now pass this to the {brand_name} support team for action."
     ],
     "directions_request_location": [
-      "Please share your current WhatsApp location so I can calculate the route to {{PROPERTY_NAME}}."
+      "Please share your current WhatsApp location and I will calculate distance, travel time and a Maps route to {property_name}.",
+      "Send your live/current location from WhatsApp. I will return the route to {property_address}.",
+      "To get real directions, share your current location here and I will prepare the Maps link."
+    ],
+    "directions_need_location": [
+      "I need your shared WhatsApp location for live directions. Please use WhatsApp's location share option.",
+      "Please send a location pin, not text, so I can calculate distance and travel time.",
+      "Directions need your current location. Share your location and I will handle the route."
     ],
     "directions_result": [
-      "Route to {{PROPERTY_NAME}}:\nDistance: {{DISTANCE_TEXT}}\nEstimated time: {{DURATION_TEXT}}\nMaps: {{MAPS_URL}}"
+      "Route to {property_name}:\nDistance: {distance_text}\nEstimated time: {duration_text}\nMaps: {maps_url}",
+      "Here are your directions for {property_address}:\nDistance: {distance_text}\nTravel time: {duration_text}\nOpen: {maps_url}",
+      "I found the route to {property_name}.\nDistance: {distance_text}\nETA: {duration_text}\n{maps_url}"
     ],
     "fallback": [
-      "I can help with check-in, Wi-Fi, parking, facilities, nearby places, checkout, support, issue reporting, and directions. Type menu to view all options."
+      "I can help with check-in, Wi-Fi, parking, apartment amenities, nearby places, checkout, XYZ Stays support, apartment issues, directions and AI Concierge questions. Type menu to see options.",
+      "Please choose an option from the XYZ Stays guest menu, or type AI Concierge to ask about your stay.",
+      "I did not match that message to a XYZ Stays guest service. Send menu to pick from the available stay options."
     ]
-  },
-  "session_example": {
-    "session_id": "{{GENERATED_SESSION_ID}}",
-    "company_id": "company_001",
-    "guest_phone": "{{GUEST_WHATSAPP_NUMBER}}",
-    "booking_id": "{{BOOKING_ID}}",
-    "selected_option": "{{MENU_OPTION_ID}}",
-    "current_step": "{{FLOW_STEP}}",
-    "last_updated_at": "{{ISO_DATETIME}}"
-  },
-  "security_notes": [
-    "Do not hardcode Wi-Fi passwords, smart-lock codes, API keys, or access tokens in public source code.",
-    "Load private values at runtime from a secure database or secrets manager.",
-    "Show property access details only after verifying a confirmed booking and registered WhatsApp number.",
-    "Keep separate company_id values to prevent one company's data from being exposed to another."
-  ]
+  }
 }
